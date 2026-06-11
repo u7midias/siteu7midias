@@ -1155,7 +1155,7 @@
     <li><a href="#servicos">Serviços</a></li>
     <li><a href="#cases">Cases</a></li>
     <li><a href="https://instagram.com/u7midias" target="_blank" rel="noopener">Instagram</a></li>
-    <li><a href="#" class="nav-cta" onclick="abrirAgente();return false;">Fazer orçamento</a></li>
+    <li><a href="#contato" class="nav-cta">Fazer orçamento</a></li>
   </ul>
 </nav>
 
@@ -1166,7 +1166,7 @@
       <h1>Seu negócio crescendo com <strong>marketing inteligente</strong></h1>
       <p>Estratégia, gestão e acompanhamento contínuo para negócios que querem crescer de forma estruturada e com resultado mensurável.</p>
       <div class="hero-actions">
-        <a href="#" class="btn-primary" onclick="abrirAgente();return false;">Fazer meu orçamento</a>
+        <a href="#contato" class="btn-primary">Fazer meu orçamento</a>
         <a href="#cases" class="btn-secondary">Ver resultados</a>
       </div>
       <div class="hero-stats">
@@ -1420,7 +1420,7 @@
   <div class="cta-inner">
     <h2>Seu concorrente já está investindo no digital. <strong>E você?</strong></h2>
     <p>Cada dia sem estratégia é um dia que alguém toma o seu espaço no mercado. Vamos mudar isso agora.</p>
-    <a href="#" onclick="abrirAgente();return false;" data-old="lizada." class="btn-primary" target="_blank">Quero meu orçamento gratuito</a>
+    <a href="https://wa.me/5511934121551?text=Ol%C3%A1%2C%20U7!%20Vi%20o%20site%20e%20quero%20meu%20or%C3%A7amento%20gratuito%20%F0%9F%99%8B" class="btn-primary" target="_blank" rel="noopener">Quero meu orçamento gratuito</a>
   </div>
 </div>
 
@@ -1469,11 +1469,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nome do estabelecimento</label>
-            <input type="text" placeholder="Ex: Restaurante do João">
+            <input type="text" placeholder="Ex: Restaurante do João" id="inp-negocio">
           </div>
           <div class="form-group">
             <label>Tipo de negócio</label>
-            <select>
+            <select id="inp-tipo">
               <option value="">Selecione</option>
               <option>Restaurante / Alimentação</option>
               <option>Saúde e Bem-estar</option>
@@ -1488,11 +1488,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>Cidade e bairro</label>
-            <input type="text" placeholder="Ex: São Paulo — Itapecerica">
+            <input type="text" placeholder="Ex: São Paulo — Itapecerica" id="inp-cidade">
           </div>
           <div class="form-group">
             <label>Serviço de interesse</label>
-            <select>
+            <select id="inp-servico">
               <option value="">Selecione</option>
               <option>Tráfego Pago</option>
               <option>Redes Sociais</option>
@@ -1503,7 +1503,7 @@
         </div>
         <div class="form-group">
           <label>Qual é o maior desafio do negócio hoje?</label>
-          <textarea placeholder="Ex: Pouco movimento, não consigo atrair clientes novos..."></textarea>
+          <textarea placeholder="Ex: Pouco movimento, não consigo atrair clientes novos..." id="inp-desafio"></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -1515,8 +1515,8 @@
             <input type="tel" placeholder="(11) 99999-9999" id="inp-tel">
           </div>
         </div>
-        <button class="form-submit" onclick="abrirAgente()">Fazer orçamento pelo assistente</button>
-        <p class="form-note">Nosso assistente vai qualificar seu perfil e montar o orçamento ideal.</p>
+        <button class="form-submit" onclick="enviarBriefing()">Fazer orçamento pelo WhatsApp</button>
+        <p class="form-note">Recebemos seu briefing e respondemos em até 24h.</p>
       </div>
     </div>
   </div>
@@ -1539,214 +1539,39 @@
 
 
 
-<!-- BOTÃO AGENTE -->
-<button class="agent-btn" onclick="abrirAgente()">
+<!-- BOTÃO WHATSAPP FLUTUANTE -->
+<a class="agent-btn" href="https://wa.me/5511934121551?text=Ol%C3%A1%2C%20U7!%20Vi%20o%20site%20e%20quero%20meu%20or%C3%A7amento%20gratuito%20%F0%9F%99%8B" target="_blank" rel="noopener">
   <span class="agent-btn-dot"></span>
   Faça seu orçamento aqui
-</button>
-
-<!-- OVERLAY AGENTE -->
-<div class="agent-overlay" id="agentOverlay" onclick="fecharFora(event)">
-  <div class="agent-box">
-    <div class="agent-header">
-      <div class="agent-header-left">
-        <div class="agent-avatar">U7</div>
-        <div>
-          <div class="agent-name">Assistente U7 Mídias</div>
-          <div class="agent-status">Online agora</div>
-        </div>
-      </div>
-      <button class="agent-close" onclick="fecharAgente()">×</button>
-    </div>
-    <div class="agent-messages" id="agentMsgs"></div>
-    <div class="agent-input-area">
-      <textarea class="agent-input" id="agentInput" placeholder="Digite sua resposta..." rows="1"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsg()}"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-      <button class="agent-send" id="agentSend" onclick="enviarMsg()">&#10148;</button>
-    </div>
-  </div>
-</div>
+</a>
 
 <script>
-const SYSTEM_PROMPT = `Você é o assistente de diagnóstico da U7 Mídias, agência especializada em Meta Ads, gestão de redes sociais (Instagram e Facebook) e consultoria estratégica.
+function enviarBriefing() {
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const negocio = v('inp-negocio');
+  const tipo = v('inp-tipo');
+  const cidade = v('inp-cidade');
+  const servico = v('inp-servico');
+  const desafio = v('inp-desafio');
+  const nome = v('inp-nome');
+  const tel = v('inp-tel');
 
-Seu papel é entender o negócio do visitante, identificar os serviços mais adequados e gerar um diagnóstico profissional ao final.
-
-FLUXO OBRIGATÓRIO (uma pergunta por vez):
-1. Pergunte o nome e tipo de negócio
-2. Pergunte qual o maior desafio hoje (atrair clientes, aumentar vendas, mais visibilidade, outro)
-3. Pergunte se já investe em marketing digital e o que já tentou
-4. Pergunte qual o objetivo principal nos próximos 3 meses
-5. Pergunte qual a cidade onde o negócio está
-
-Após coletar essas 5 informações, gere um DIAGNÓSTICO com este formato exato:
-
----
-DIAGNÓSTICO U7 MÍDIAS
-
-Negócio: [nome e tipo]
-Cidade: [cidade]
-Desafio principal: [resumo do desafio]
-Objetivo: [objetivo declarado]
-
-SERVIÇOS RECOMENDADOS:
-[liste apenas os serviços que fazem sentido para o perfil, com uma linha de justificativa para cada]
-
-PRÓXIMO PASSO:
-Clique no botão abaixo para receber seu orçamento personalizado pelo WhatsApp. Nossa equipe entra em contato em até 24h.
----
-
-REGRAS:
-- Seja direto e profissional, sem ser robótico
-- Uma pergunta por vez, máximo 2 frases por mensagem
-- Não mencione preços nem valores
-- Não diga "vou te chamar" ou "nossa equipe vai entrar em contato" ANTES do diagnóstico
-- Somente após o diagnóstico completo mostre o botão de WhatsApp
-- Escreva sempre em português brasileiro
-- Quando gerar o diagnóstico, termine EXATAMENTE com a palavra: DIAGNOSTICO_PRONTO`;
-
-let historico = [];
-let agentAberto = false;
-let iniciado = false;
-let diagnosticoPronto = false;
-let dadosCliente = {};
-
-function abrirAgente() {
-  document.getElementById('agentOverlay').classList.add('open');
-  agentAberto = true;
-  if (!iniciado) {
-    iniciado = true;
-    setTimeout(() => chamarClaude(null), 300);
-  }
-}
-
-function fecharAgente() {
-  document.getElementById('agentOverlay').classList.remove('open');
-  agentAberto = false;
-}
-
-function fecharFora(e) {
-  if (e.target === document.getElementById('agentOverlay')) fecharAgente();
-}
-
-function addMsg(texto, tipo) {
-  const container = document.getElementById('agentMsgs');
-  const div = document.createElement('div');
-  div.className = 'msg ' + tipo;
-  div.innerHTML = texto
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\n/g,'<br>')
-    .replace(/---<br>/g,'<hr style="border:none;border-top:1px solid rgba(244,248,245,0.15);margin:0.75rem 0;">')
-    .replace(/DIAGNOSTICO_PRONTO/g,'');
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  return div;
-}
-
-function removeTyping() {
-  const t = document.querySelector('.msg.typing');
-  if (t) t.remove();
-}
-
-function mostrarBotaoOrcamento(resumo) {
-  const container = document.getElementById('agentMsgs');
-
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;';
-
-  const btn = document.createElement('button');
-  btn.className = 'agent-wa-btn';
-  btn.textContent = 'Receber meu orçamento pelo WhatsApp';
-  btn.onclick = () => {
-    const msg = 'Olá! Acabei de fazer o diagnóstico pelo site da U7 Mídias e gostaria de receber meu orçamento.\n\n' + resumo.replace(/DIAGNOSTICO_PRONTO/g,'').trim();
-    window.open('https://wa.me/5511934121551?text=' + encodeURIComponent(msg), '_blank');
-    btn.textContent = 'Enviado! Aguarde nosso contato em até 24h.';
-    btn.disabled = true;
-    btn.style.background = 'var(--green-600)';
-    btn.style.color = 'var(--white)';
-  };
-
-  wrap.appendChild(btn);
-  container.appendChild(wrap);
-  container.scrollTop = container.scrollHeight;
-}
-
-async function chamarClaude(mensagemUsuario) {
-  const sendBtn = document.getElementById('agentSend');
-  const input = document.getElementById('agentInput');
-  sendBtn.disabled = true;
-  input.disabled = true;
-
-  if (mensagemUsuario !== null) {
-    historico.push({ role: 'user', content: mensagemUsuario });
+  if (!nome || !negocio) {
+    alert('Por favor, preencha pelo menos seu nome e o nome do estabelecimento.');
+    return;
   }
 
-  const typingEl = addMsg('Analisando...', 'typing');
+  let msg = 'Olá, U7! Preenchi o briefing no site e quero meu orçamento 🙋\n\n';
+  msg += '*Nome:* ' + nome + '\n';
+  msg += '*Estabelecimento:* ' + negocio + '\n';
+  if (tipo) msg += '*Tipo de negócio:* ' + tipo + '\n';
+  if (cidade) msg += '*Cidade/bairro:* ' + cidade + '\n';
+  if (servico) msg += '*Serviço de interesse:* ' + servico + '\n';
+  if (desafio) msg += '*Maior desafio:* ' + desafio + '\n';
+  if (tel) msg += '*Meu WhatsApp:* ' + tel;
 
-  try {
-    const messages = mensagemUsuario === null
-      ? [{ role: 'user', content: 'Inicie a conversa: cumprimente de forma profissional e faça a primeira pergunta.' }]
-      : historico;
-
-    const resp = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: messages
-      })
-    });
-
-    const data = await resp.json();
-    removeTyping();
-
-    if (data.error) {
-      addMsg('Erro de configuração: ' + data.error.message, 'agent');
-      sendBtn.disabled = false;
-      input.disabled = false;
-      return;
-    }
-
-    const resposta = data.content?.[0]?.text || 'Erro ao processar. Tente novamente.';
-    historico.push({ role: 'assistant', content: resposta });
-
-    addMsg(resposta, 'agent');
-
-    if (resposta.includes('DIAGNOSTICO_PRONTO')) {
-      diagnosticoPronto = true;
-      input.disabled = true;
-      sendBtn.disabled = true;
-      input.placeholder = 'Diagnóstico concluído';
-      mostrarBotaoOrcamento(resposta);
-      return;
-    }
-
-  } catch(err) {
-    removeTyping();
-    addMsg('Erro de conexão. Verifique sua chave de API.', 'agent');
-  }
-
-  sendBtn.disabled = false;
-  input.disabled = false;
-  input.focus();
+  window.open('https://wa.me/5511934121551?text=' + encodeURIComponent(msg), '_blank');
 }
-
-function enviarMsg() {
-  if (diagnosticoPronto) return;
-  const input = document.getElementById('agentInput');
-  const texto = input.value.trim();
-  if (!texto) return;
-  addMsg(texto, 'user');
-  input.value = '';
-  input.style.height = 'auto';
-  chamarClaude(texto);
-}
-
 </script>
 
 </body>
