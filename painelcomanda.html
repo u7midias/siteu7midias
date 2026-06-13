@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Comandas ao vivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ============================================================
+   PAINEL DE COMANDAS AO VIVO — dashboard para PC
+   Conecta no MESMO Supabase do app (gestão/garçom) e só LÊ os
+   dados, mostrando tudo que está acontecendo em tempo real.
+   ============================================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#1e7a45; --accent2:#27a85f; --accent-weak:#e6f4ec; --accent-line:#cfe9da;
+  --bg:#eef1f4; --surface:#ffffff; --surface2:#f7f9fb;
+  --border:#e2e7ec; --text:#0f1722; --muted:#67727f; --muted2:#9aa5b1;
+  --ok:#0f9d58; --warn:#c77800; --warn-bg:#fff4e0; --late:#d23a3a; --late-bg:#fdecec;
+  --shadow:0 1px 2px rgba(15,23,34,.04), 0 8px 24px rgba(15,23,34,.06);
+  --shadow-lg:0 12px 40px rgba(15,23,34,.12);
+}
+html{font-family:'Inter',system-ui,sans-serif;color:var(--text);font-feature-settings:'tnum' 1,'cv01' 1}
+body{background:var(--bg);min-height:100vh}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.86);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;padding:14px 28px}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.brand-logo{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;
+  align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.brand-logo img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.brand-txt{min-width:0}
+.brand-eyebrow{font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+.brand-name{font-size:1.18rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-spacer{flex:1}
+.live{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:700;padding:7px 13px;border-radius:999px;
+  background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.live .dot{width:9px;height:9px;border-radius:50%;background:var(--muted2);position:relative}
+.live.on .dot{background:var(--ok)}
+.live.on .dot::after{content:"";position:absolute;inset:-5px;border-radius:50%;background:var(--ok);opacity:.35;animation:ping 1.8s ease-out infinite}
+.live.off .dot{background:var(--late)}
+.live.warn .dot{background:var(--warn)}
+@keyframes ping{0%{transform:scale(.6);opacity:.5}100%{transform:scale(2.2);opacity:0}}
+.clock{text-align:right;line-height:1.15}
+.clock .t{font-size:1.18rem;font-weight:800;letter-spacing:-.01em}
+.clock .d{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:capitalize}
+.btn-refresh{border:1px solid var(--border);background:var(--surface);border-radius:11px;width:42px;height:42px;
+  cursor:pointer;font-size:1.1rem;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:.15s}
+.btn-refresh:hover{background:var(--surface2);color:var(--text)}
+.btn-refresh.spin{animation:spin .6s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1480px;margin:0 auto;padding:26px 28px 60px}
+
+/* ---------- KPIs ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:26px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi-label{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.kpi-val{font-size:2rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.kpi-sub{font-size:.76rem;color:var(--muted);margin-top:7px;font-weight:500}
+.kpi.hero{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff}
+.kpi.hero .kpi-label{color:rgba(255,255,255,.85)}
+.kpi.hero .kpi-sub{color:rgba(255,255,255,.8)}
+.kpi.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.09)}
+
+/* ---------- content grid ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.section-title{font-size:1.06rem;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.count-pill{background:var(--accent-weak);color:var(--accent);font-size:.78rem;font-weight:800;padding:3px 11px;border-radius:999px}
+.controls{display:flex;gap:8px;align-items:center}
+.search{border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:9px 13px;font-size:.86rem;
+  font-family:inherit;width:190px;color:var(--text);outline:none;transition:.15s}
+.search:focus{border-color:var(--accent2);box-shadow:0 0 0 3px var(--accent-weak)}
+.search::placeholder{color:var(--muted2)}
+.sortsel{border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:9px 11px;font-size:.84rem;font-family:inherit;color:var(--muted);cursor:pointer;outline:none}
+
+/* ---------- comanda cards ---------- */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 17px;box-shadow:var(--shadow);
+  cursor:pointer;transition:transform .14s,box-shadow .14s,border-color .14s;position:relative;animation:pop .28s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent-line)}
+.card.flash{animation:flash 1.1s ease}
+@keyframes flash{0%{box-shadow:0 0 0 0 var(--accent2)}25%{box-shadow:0 0 0 4px var(--accent-weak)}100%{box-shadow:var(--shadow)}}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:13px}
+.card-name{font-size:1.08rem;font-weight:800;letter-spacing:-.01em;line-height:1.2;word-break:break-word}
+.card-total{font-size:1.16rem;font-weight:900;color:var(--accent);white-space:nowrap;letter-spacing:-.02em}
+.card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:8px;background:var(--surface2);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.chip.age-ok{background:var(--accent-weak);color:var(--accent)}
+.chip.age-warn{background:var(--warn-bg);color:var(--warn)}
+.chip.age-late{background:var(--late-bg);color:var(--late)}
+.card-items{margin-top:13px;padding-top:13px;border-top:1px dashed var(--border);display:none}
+.card.open .card-items{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.li{display:flex;justify-content:space-between;gap:10px;font-size:.85rem;padding:4px 0;color:var(--text)}
+.li .ln{color:var(--muted);font-weight:500}
+.li .lq{color:var(--text);font-weight:700}
+.li .lv{font-weight:700;white-space:nowrap}
+.li.pisc .ln{color:var(--accent);font-weight:600}
+.card-expand{margin-top:10px;font-size:.74rem;color:var(--muted2);font-weight:600;text-align:center}
+
+/* ---------- side panels ---------- */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 19px;box-shadow:var(--shadow);margin-bottom:18px}
+.panel h3{font-size:.95rem;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--surface2)}
+.row:last-child{border-bottom:0}
+.rank{width:24px;height:24px;border-radius:7px;background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;font-weight:800;color:var(--muted);flex-shrink:0}
+.rank.g1{background:#fef3c7;color:#a16207}.rank.g2{background:#e5e7eb;color:#4b5563}.rank.g3{background:#fde7d3;color:#b45309}
+.row-main{flex:1;min-width:0}
+.row-name{font-size:.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{font-size:.74rem;color:var(--muted)}
+.row-val{font-size:.9rem;font-weight:800;color:var(--accent);white-space:nowrap}
+.row-val.neutral{color:var(--text)}
+.feed-time{font-size:.7rem;color:var(--muted2);font-weight:600}
+
+/* ---------- empty / loading ---------- */
+.empty{grid-column:1/-1;text-align:center;padding:54px 20px;color:var(--muted)}
+.empty .e-ico{font-size:2.6rem;margin-bottom:10px;opacity:.7}
+.empty .e-t{font-size:1rem;font-weight:700;color:var(--text)}
+.empty .e-s{font-size:.85rem;margin-top:4px}
+.skel{background:linear-gradient(90deg,var(--surface2) 25%,#eef1f4 50%,var(--surface2) 75%);background-size:200% 100%;
+  animation:sh 1.3s infinite;border-radius:16px;height:118px}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* ---------- loading overlay ---------- */
+#load{position:fixed;inset:0;background:var(--bg);z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#load .ld-logo{width:58px;height:58px;border-radius:16px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.9rem}
+#load .ld-spin{width:30px;height:30px;border:3px solid var(--accent-line);border-top-color:var(--accent);border-radius:50%;animation:spin2 .8s linear infinite}
+@keyframes spin2{to{transform:rotate(360deg)}}
+#load .ld-txt{color:var(--muted);font-weight:600;font-size:.9rem}
+
+/* ---------- config warning ---------- */
+.cfg-warn{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--warn-bg);color:var(--warn);
+  border:1px solid #f3d49a;padding:12px 20px;border-radius:13px;font-size:.85rem;font-weight:700;z-index:80;box-shadow:var(--shadow-lg);max-width:90vw;text-align:center}
+
+/* ---------- filtro de período ---------- */
+.filtro{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.filtro-seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:3px;box-shadow:var(--shadow)}
+.seg{border:0;background:transparent;font-family:inherit;font-size:.84rem;font-weight:700;color:var(--muted);padding:8px 17px;border-radius:9px;cursor:pointer;transition:.15s}
+.seg:hover{color:var(--text)}
+.seg.ativa{background:var(--accent);color:#fff}
+.f-input{border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:9px 12px;font-size:.86rem;font-family:inherit;color:var(--text);outline:none;box-shadow:var(--shadow);cursor:pointer}
+.f-input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px var(--accent-weak)}
+.f-hoje{border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:9px 15px;font-size:.84rem;font-weight:700;color:var(--accent);cursor:pointer;font-family:inherit;box-shadow:var(--shadow);transition:.15s}
+.f-hoje:hover{background:var(--accent-weak)}
+.f-label{font-size:.82rem;color:var(--muted);font-weight:700;margin-left:auto;background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:999px}
+
+@media (max-width:1080px){ .cols{grid-template-columns:1fr} }
+@media (max-width:560px){
+  .top{padding:12px 16px;gap:12px} .wrap{padding:18px 16px 50px} .clock{display:none}
+  .controls{flex-wrap:wrap} .search{width:100%}
+}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+
+<div id="load">
+  <div class="ld-logo" id="ld-logo">🧾</div>
+  <div class="ld-spin"></div>
+  <div class="ld-txt">Conectando ao painel…</div>
+</div>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-logo" id="brand-logo">🧾</div>
+    <div class="brand-txt">
+      <div class="brand-eyebrow">Painel ao vivo</div>
+      <div class="brand-name" id="brand-name">Nome do Estabelecimento</div>
+    </div>
+  </div>
+  <div class="top-spacer"></div>
+  <div class="live off" id="live"><span class="dot"></span><span id="live-txt">Conectando…</span></div>
+  <div class="clock"><div class="t tnum" id="clk-t">--:--</div><div class="d" id="clk-d">—</div></div>
+  <button class="btn-refresh" id="btn-refresh" title="Atualizar agora">↻</button>
+</header>
+
+<div class="wrap">
+  <!-- FILTRO DE PERÍODO -->
+  <section class="filtro">
+    <div class="filtro-seg" id="seg-grp">
+      <button class="seg ativa" data-tipo="dia">Dia</button>
+      <button class="seg" data-tipo="mes">Mês</button>
+      <button class="seg" data-tipo="ano">Ano</button>
+    </div>
+    <input class="f-input" id="f-dia" type="date">
+    <input class="f-input" id="f-mes" type="month" style="display:none">
+    <select class="f-input" id="f-ano" style="display:none"></select>
+    <button class="f-hoje" id="f-hoje">Hoje</button>
+    <span class="f-label" id="f-label">Mostrando: hoje</span>
+  </section>
+
+  <!-- KPIs -->
+  <section class="kpis" id="kpis">
+    <div class="kpi hero">
+      <div class="kpi-label">💰 Em aberto agora</div>
+      <div class="kpi-val tnum" id="k-aberto">R$ 0,00</div>
+      <div class="kpi-sub" id="k-aberto-sub">nas comandas abertas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">🪑 Comandas abertas</div>
+      <div class="kpi-val tnum" id="k-mesas">0</div>
+      <div class="kpi-sub">sendo atendidas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">📈 Faturamento</div>
+      <div class="kpi-val tnum" id="k-fat">R$ 0,00</div>
+      <div class="kpi-sub" id="k-fat-sub">hoje</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">🧾 Comandas fechadas</div>
+      <div class="kpi-val tnum" id="k-fech">0</div>
+      <div class="kpi-sub" id="k-ticket">ticket médio —</div>
+    </div>
+    <div class="kpi" id="kpi-entrada">
+      <div class="kpi-label" id="k-ent-lbl">🏊 Entradas hoje</div>
+      <div class="kpi-val tnum" id="k-ent">R$ 0,00</div>
+      <div class="kpi-sub" id="k-cons">consumo R$ 0,00</div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <!-- BOARD -->
+    <main>
+      <div class="section-head">
+        <div class="section-title">🟢 Comandas em aberto <span class="count-pill" id="board-count">0</span></div>
+        <div class="controls">
+          <input class="search" id="search" type="text" placeholder="Buscar nome…" autocomplete="off">
+          <select class="sortsel" id="sort">
+            <option value="recent">Mais recentes</option>
+            <option value="old">Mais tempo abertas</option>
+            <option value="value">Maior valor</option>
+            <option value="name">Nome (A–Z)</option>
+          </select>
+        </div>
+      </div>
+      <div class="board" id="board">
+        <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+      </div>
+    </main>
+
+    <!-- SIDE -->
+    <aside>
+      <div class="panel">
+        <h3 id="top-title">🏆 Mais vendidos</h3>
+        <div id="top-prod"><div class="row-sub" style="padding:6px 0">Carregando…</div></div>
+      </div>
+      <div class="panel">
+        <h3 id="feed-title">🧾 Últimas vendas</h3>
+        <div id="feed"><div class="row-sub" style="padding:6px 0">Carregando…</div></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  ⚙️  CONFIGURAÇÃO — preencha com os dados do estabelecimento      ║
+   ║                                                                  ║
+   ║  Use as MESMAS chaves do Supabase que estão no app do cliente    ║
+   ║  (gestao.html / garcom.html). Assim o painel acompanha as         ║
+   ║  comandas lançadas pelos garçons em tempo real, na tela do PC.   ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+const CONFIG = {
+  NOME: 'Nome do Estabelecimento',     // aparece no topo do painel
+  EMOJI: '🧾',                         // emoji/ícone da marca
+  LOGO_URL: '',                        // link https de um logo (ou deixe '' p/ usar o emoji)
+
+  COR_PRIMARIA: '#1e7a45',             // cor de destaque do painel
+  COR_SECUNDARIA: '#27a85f',
+
+  /* Entradas (piscina/day-use). Se for só bar/restaurante: MOSTRAR_ENTRADAS:false */
+  MOSTRAR_ENTRADAS: true,
+  ROTULO_ENTRADA: '🏊 Entradas hoje',
+  ROTULO_CONSUMO: 'consumo',
+
+  /* Tempo (minutos) para a comanda mudar de cor — ajuda a ver mesa parada */
+  ALERTA_AMARELO: 45,
+  ALERTA_VERMELHO: 90,
+
+  /* Supabase do cliente (Settings → API) */
+  SUPA_URL: 'https://SEU-PROJETO.supabase.co',
+  SUPA_KEY: 'COLE_AQUI_A_CHAVE_ANON_PUBLIC',
+};
+/* ════════════════ FIM DA CONFIGURAÇÃO ════════════════ */
+
+/* ---------- utils ---------- */
+const fmt = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const toBR = d => new Date(d.getTime() - 3*60*60*1000);
+const diaStr = d => toBR(d).toISOString().slice(0,10);
+const mesStr = d => toBR(d).toISOString().slice(0,7);
+const totalC = c => (c.itens||[]).reduce((s,i)=>s + i.preco*(i.qtd||1), 0);
+const hora = d => d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const elapsed = ms => { const m=Math.floor(ms/60000); if(m<1)return'agora';
+  if(m<60)return m+' min'; const h=Math.floor(m/60); return h+'h'+String(m%60).padStart(2,'0'); };
+
+const anoStr = d => toBR(d).toISOString().slice(0,4);
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+/* ---------- estado ---------- */
+let sb=null, comandas=[], historico=[];
+let abertos=new Set();          // comandas expandidas
+let periodo={tipo:'dia', valor:''};   // filtro de período (dia/mes/ano)
+const prevTotais={};            // p/ detectar mudança e piscar
+const kpiAtual={};              // p/ animar números
+
+function periodoMatch(dataISO){
+  const d=new Date(dataISO);
+  if(periodo.tipo==='dia') return diaStr(d)===periodo.valor;
+  if(periodo.tipo==='mes') return mesStr(d)===periodo.valor;
+  return anoStr(d)===periodo.valor;
+}
+function isHoje(){ return periodo.tipo==='dia' && periodo.valor===diaStr(new Date()); }
+function periodoTxt(){
+  if(periodo.tipo==='dia'){ if(isHoje())return'hoje'; const[a,m,d]=periodo.valor.split('-'); return d+'/'+m+'/'+a; }
+  if(periodo.tipo==='mes'){ const[a,m]=periodo.valor.split('-'); return MESES[+m-1]+' '+a; }
+  return periodo.valor;
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function mixCor(hex,t){const n=hex.replace('#','');const r=parseInt(n.substr(0,2),16),g=parseInt(n.substr(2,2),16),b=parseInt(n.substr(4,2),16);
+  const m=v=>Math.round(v+(255-v)*t).toString(16).padStart(2,'0');return '#'+m(r)+m(g)+m(b);}
+
+function aplicarConfig(){
+  document.title = 'Painel — ' + CONFIG.NOME;
+  const r=document.documentElement.style;
+  r.setProperty('--accent',CONFIG.COR_PRIMARIA);
+  r.setProperty('--accent2',CONFIG.COR_SECUNDARIA);
+  r.setProperty('--accent-weak',mixCor(CONFIG.COR_PRIMARIA,.88));
+  r.setProperty('--accent-line',mixCor(CONFIG.COR_PRIMARIA,.72));
+  document.getElementById('brand-name').textContent=CONFIG.NOME;
+  document.getElementById('k-ent-lbl').textContent=CONFIG.ROTULO_ENTRADA.replace(/\s*hoje$/i,'');
+  [['brand-logo'],['ld-logo']].forEach(([id])=>{
+    const el=document.getElementById(id);
+    if(CONFIG.LOGO_URL){el.innerHTML='<img src="'+CONFIG.LOGO_URL+'" alt="">';}
+    else{el.textContent=CONFIG.EMOJI;}
+  });
+  if(!CONFIG.MOSTRAR_ENTRADAS) document.getElementById('kpi-entrada').style.display='none';
+}
+
+/* ---------- relógio ---------- */
+function tickRelogio(){
+  const d=new Date();
+  document.getElementById('clk-t').textContent=hora(d);
+  document.getElementById('clk-d').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+}
+
+/* ---------- status de conexão ---------- */
+function status(estado){
+  const el=document.getElementById('live'), txt=document.getElementById('live-txt');
+  el.className='live '+(estado==='on'?'on':estado==='warn'?'warn':'off');
+  txt.textContent = estado==='on'?'Ao vivo' : estado==='warn'?'Reconectando…' : 'Sem conexão';
+}
+
+/* ---------- animação de número ---------- */
+function animaNum(id,destino,money){
+  const el=document.getElementById(id); if(!el)return;
+  const ini=kpiAtual[id]||0; kpiAtual[id]=destino;
+  if(ini===destino){el.textContent=money?'R$ '+fmt(destino):destino;return;}
+  const t0=performance.now(),dur=500;
+  function step(t){const p=Math.min(1,(t-t0)/dur);const e=1-Math.pow(1-p,3);const v=ini+(destino-ini)*e;
+    el.textContent=money?'R$ '+fmt(v):Math.round(v);if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+/* ---------- carregar dados ---------- */
+async function carregar(){
+  try{
+    const [{data:c,error:e1},{data:h,error:e2}]=await Promise.all([
+      sb.from('comandas').select('*').order('aberta',{ascending:true}),
+      sb.from('historico').select('*').order('data',{ascending:false}),
+    ]);
+    if(e1||e2) throw (e1||e2);
+    comandas=(c||[]).map(x=>({...x,id:Number(x.id)}));
+    historico=h||[];
+    populateAnos();
+    document.getElementById('load').style.display='none';
+    renderTudo();
+    return true;
+  }catch(err){ console.error(err); status('off'); return false; }
+}
+
+/* ---------- KPIs ---------- */
+function renderKpis(){
+  // sempre ao vivo: o que está aberto agora
+  const emAberto=comandas.reduce((s,c)=>s+totalC(c),0);
+  animaNum('k-aberto',emAberto,true);
+  animaNum('k-mesas',comandas.length,false);
+  const ni=comandas.reduce((s,c)=>s+(c.itens||[]).reduce((a,i)=>a+(i.qtd||1),0),0);
+  document.getElementById('k-aberto-sub').textContent=ni+' item(ns) em '+comandas.length+' comanda(s)';
+
+  // histórico filtrado pelo período escolhido
+  const hSel=historico.filter(h=>periodoMatch(h.data));
+  const fat=hSel.reduce((s,h)=>s+(h.total||0),0);
+  const nFech=hSel.length;
+  const ent=hSel.reduce((s,h)=>s+(h.itens||[]).filter(i=>i.pisc).reduce((a,i)=>a+i.preco*(i.qtd||1),0),0);
+  const cons=hSel.reduce((s,h)=>s+(h.itens||[]).filter(i=>!i.pisc).reduce((a,i)=>a+i.preco*(i.qtd||1),0),0);
+  animaNum('k-fat',fat,true);
+  animaNum('k-fech',nFech,false);
+  animaNum('k-ent',ent,true);
+  document.getElementById('k-cons').textContent=CONFIG.ROTULO_CONSUMO+' R$ '+fmt(cons);
+  document.getElementById('k-ticket').textContent='ticket médio '+(nFech?'R$ '+fmt(fat/nFech):'—');
+  document.getElementById('k-fat-sub').textContent=cap(periodoTxt());
+}
+
+/* ---------- board ---------- */
+function ageClass(min){ if(min>=CONFIG.ALERTA_VERMELHO)return'age-late'; if(min>=CONFIG.ALERTA_AMARELO)return'age-warn'; return'age-ok'; }
+
+function renderBoard(){
+  const el=document.getElementById('board');
+  const termo=(document.getElementById('search').value||'').toLowerCase().trim();
+  const sort=document.getElementById('sort').value;
+  let lista=comandas.filter(c=>!termo||(c.nome||'').toLowerCase().includes(termo));
+  const now=Date.now();
+  lista.sort((a,b)=>{
+    if(sort==='recent')return new Date(b.aberta)-new Date(a.aberta);
+    if(sort==='old')   return new Date(a.aberta)-new Date(b.aberta);
+    if(sort==='value') return totalC(b)-totalC(a);
+    if(sort==='name')  return (a.nome||'').localeCompare(b.nome||'');
+  });
+  document.getElementById('board-count').textContent=comandas.length;
+
+  if(!comandas.length){
+    el.innerHTML='<div class="empty"><div class="e-ico">🍃</div><div class="e-t">Nenhuma comanda aberta</div><div class="e-s">Assim que um garçom abrir uma comanda, ela aparece aqui na hora.</div></div>';
+    return;
+  }
+  if(!lista.length){
+    el.innerHTML='<div class="empty"><div class="e-ico">🔎</div><div class="e-t">Nada encontrado</div><div class="e-s">Nenhuma comanda com “'+termo+'”.</div></div>';
+    return;
+  }
+
+  el.innerHTML=lista.map(c=>{
+    const tot=totalC(c);
+    const min=Math.floor((now-new Date(c.aberta).getTime())/60000);
+    const flash = prevTotais[c.id]!==undefined && prevTotais[c.id]!==tot;
+    const aberto = abertos.has(c.id);
+    const ni=(c.itens||[]).reduce((s,i)=>s+(i.qtd||1),0);
+    const itensHtml=(c.itens||[]).length
+      ? (c.itens).map(it=>'<div class="li'+(it.pisc?' pisc':'')+'"><span class="ln">'+(it.qtd>1?'<span class="lq">'+it.qtd+'×</span> ':'')+it.nome+'</span><span class="lv">R$ '+fmt(it.preco*(it.qtd||1))+'</span></div>').join('')
+      : '<div class="row-sub">Sem itens ainda</div>';
+    return '<div class="card'+(flash?' flash':'')+(aberto?' open':'')+'" data-id="'+c.id+'">'
+      +'<div class="card-top"><div class="card-name">'+(c.nome||'—')+'</div><div class="card-total tnum">R$ '+fmt(tot)+'</div></div>'
+      +'<div class="card-meta">'
+        +'<span class="chip">🛒 '+ni+' item(ns)</span>'
+        +'<span class="chip '+ageClass(min)+'" data-aberta="'+c.aberta+'">🕐 '+elapsed(now-new Date(c.aberta).getTime())+'</span>'
+        +'<span class="chip">aberta '+hora(new Date(c.aberta))+'</span>'
+      +'</div>'
+      +'<div class="card-items">'+itensHtml+'</div>'
+      +'<div class="card-expand">'+(aberto?'▲ ocultar itens':'▼ ver itens')+'</div>'
+      +'</div>';
+  }).join('');
+
+  comandas.forEach(c=>prevTotais[c.id]=totalC(c));
+}
+
+/* clique p/ expandir */
+document.getElementById('board').addEventListener('click',e=>{
+  const card=e.target.closest('.card'); if(!card)return;
+  const id=Number(card.dataset.id);
+  if(abertos.has(id))abertos.delete(id); else abertos.add(id);
+  card.classList.toggle('open');
+  const exp=card.querySelector('.card-expand');
+  if(exp)exp.textContent=card.classList.contains('open')?'▲ ocultar itens':'▼ ver itens';
+});
+
+/* atualiza só os relógios das comandas a cada 20s (sem perder estado) */
+function tickIdades(){
+  const now=Date.now();
+  document.querySelectorAll('.chip[data-aberta]').forEach(ch=>{
+    const ab=new Date(ch.dataset.aberta).getTime();
+    const min=Math.floor((now-ab)/60000);
+    ch.textContent='🕐 '+elapsed(now-ab);
+    ch.className='chip '+ageClass(min);
+  });
+}
+
+/* ---------- side panels ---------- */
+function renderTop(){
+  document.getElementById('top-title').textContent='🏆 Mais vendidos · '+periodoTxt();
+  const mapa={};
+  historico.filter(h=>periodoMatch(h.data)).forEach(h=>{
+    (h.itens||[]).forEach(it=>{ if(!mapa[it.nome])mapa[it.nome]={n:it.nome,q:0,t:0};
+      mapa[it.nome].q+=(it.qtd||1); mapa[it.nome].t+=it.preco*(it.qtd||1); });
+  });
+  const lista=Object.values(mapa).sort((a,b)=>b.q-a.q).slice(0,6);
+  const el=document.getElementById('top-prod');
+  if(!lista.length){el.innerHTML='<div class="row-sub" style="padding:6px 0">Nenhuma venda neste período.</div>';return;}
+  el.innerHTML=lista.map((p,i)=>'<div class="row"><div class="rank'+(i<3?' g'+(i+1):'')+'">'+(i+1)+'</div>'
+    +'<div class="row-main"><div class="row-name">'+p.n+'</div><div class="row-sub">'+p.q+' un.</div></div>'
+    +'<div class="row-val">R$ '+fmt(p.t)+'</div></div>').join('');
+}
+
+function renderFeed(){
+  const el=document.getElementById('feed');
+  document.getElementById('feed-title').textContent = isHoje() ? '🧾 Últimas vendas' : '🧾 Vendas · '+periodoTxt();
+  const lista=historico.filter(h=>periodoMatch(h.data)).slice(0,12);
+  if(!lista.length){el.innerHTML='<div class="row-sub" style="padding:6px 0">Nenhuma comanda fechada neste período.</div>';return;}
+  el.innerHTML=lista.map(h=>{
+    const d=new Date(h.data);
+    return '<div class="row"><div class="row-main"><div class="row-name">'+h.nome+'</div>'
+      +'<div class="row-sub feed-time">'+d.toLocaleDateString('pt-BR')+' • '+hora(d)+'</div></div>'
+      +'<div class="row-val">R$ '+fmt(h.total)+'</div></div>';
+  }).join('');
+}
+
+function setLabel(){ document.getElementById('f-label').textContent='Mostrando: '+periodoTxt(); }
+function populateAnos(){
+  const set=new Set(historico.map(h=>anoStr(new Date(h.data))));
+  set.add(anoStr(new Date()));
+  const sel=document.getElementById('f-ano'); const atual=sel.value;
+  const anos=[...set].sort().reverse();
+  sel.innerHTML=anos.map(y=>'<option value="'+y+'">'+y+'</option>').join('');
+  if(atual && anos.includes(atual)) sel.value=atual;
+}
+function aplicarPeriodo(){ setLabel(); renderKpis(); renderTop(); renderFeed(); }
+
+function renderTudo(){ setLabel(); renderKpis(); renderBoard(); renderTop(); renderFeed(); }
+
+/* ---------- realtime ---------- */
+function iniciarRealtime(){
+  sb.channel('painel-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'comandas'},async()=>{
+      const {data:c}=await sb.from('comandas').select('*').order('aberta',{ascending:true});
+      if(c){comandas=c.map(x=>({...x,id:Number(x.id)})); renderKpis(); renderBoard();}
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'historico'},async()=>{
+      const {data:h}=await sb.from('historico').select('*').order('data',{ascending:false});
+      if(h){historico=h; populateAnos(); renderKpis(); renderTop(); renderFeed();}
+    })
+    .subscribe(st=>{
+      if(st==='SUBSCRIBED')status('on');
+      else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT')status('warn');
+      else if(st==='CLOSED')status('off');
+    });
+}
+
+/* ---------- refresh manual ---------- */
+document.getElementById('btn-refresh').addEventListener('click',async function(){
+  this.classList.add('spin'); await carregar(); setTimeout(()=>this.classList.remove('spin'),600);
+});
+document.getElementById('search').addEventListener('input',renderBoard);
+document.getElementById('sort').addEventListener('change',renderBoard);
+
+/* ---------- filtro de período ---------- */
+document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.seg').forEach(x=>x.classList.remove('ativa'));
+  b.classList.add('ativa');
+  periodo.tipo=b.dataset.tipo;
+  document.getElementById('f-dia').style.display=periodo.tipo==='dia'?'':'none';
+  document.getElementById('f-mes').style.display=periodo.tipo==='mes'?'':'none';
+  document.getElementById('f-ano').style.display=periodo.tipo==='ano'?'':'none';
+  if(periodo.tipo==='dia') periodo.valor=document.getElementById('f-dia').value||diaStr(new Date());
+  if(periodo.tipo==='mes') periodo.valor=document.getElementById('f-mes').value||mesStr(new Date());
+  if(periodo.tipo==='ano') periodo.valor=document.getElementById('f-ano').value||anoStr(new Date());
+  aplicarPeriodo();
+}));
+document.getElementById('f-dia').addEventListener('change',e=>{ periodo.valor=e.target.value||diaStr(new Date()); aplicarPeriodo(); });
+document.getElementById('f-mes').addEventListener('change',e=>{ periodo.valor=e.target.value||mesStr(new Date()); aplicarPeriodo(); });
+document.getElementById('f-ano').addEventListener('change',e=>{ periodo.valor=e.target.value; aplicarPeriodo(); });
+document.getElementById('f-hoje').addEventListener('click',()=>{
+  periodo={tipo:'dia',valor:diaStr(new Date())};
+  document.querySelectorAll('.seg').forEach(x=>x.classList.toggle('ativa',x.dataset.tipo==='dia'));
+  const fd=document.getElementById('f-dia'); fd.style.display=''; fd.value=diaStr(new Date());
+  document.getElementById('f-mes').style.display='none';
+  document.getElementById('f-ano').style.display='none';
+  aplicarPeriodo();
+});
+
+/* ---------- init ---------- */
+(async function(){
+  aplicarConfig();
+  periodo={tipo:'dia',valor:diaStr(new Date())};
+  document.getElementById('f-dia').value=diaStr(new Date());
+  document.getElementById('f-mes').value=mesStr(new Date());
+  populateAnos();
+  tickRelogio(); setInterval(tickRelogio,1000);
+  setInterval(tickIdades,20000);
+
+  if(CONFIG.SUPA_URL.includes('SEU-PROJETO')||CONFIG.SUPA_KEY.includes('COLE_AQUI')){
+    document.getElementById('load').style.display='none';
+    status('off');
+    renderTudo();
+    const w=document.createElement('div');w.className='cfg-warn';
+    w.innerHTML='⚙️ Preencha <b>SUPA_URL</b> e <b>SUPA_KEY</b> no bloco CONFIG (use as mesmas chaves do app do cliente) para o painel conectar.';
+    document.body.appendChild(w);
+    return;
+  }
+  try{ sb=supabase.createClient(CONFIG.SUPA_URL,CONFIG.SUPA_KEY); }
+  catch(e){ document.getElementById('load').style.display='none'; status('off'); return; }
+  const ok=await carregar();
+  if(ok) iniciarRealtime();
+})();
+</script>
+</body>
+</html>
