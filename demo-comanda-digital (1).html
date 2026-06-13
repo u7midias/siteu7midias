@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comanda Digital — Sistema Profissional de Comandas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#1a6e3c;--verde2:#22c55e;--verde3:#bbf7d0;--ve:#0f3d21;--am:#fbbf24;--br:#f9fdf9;--tx:#0c1a0e;--ci:#6b7280;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--br);color:var(--tx);overflow-x:hidden;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,22,12,.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-logo{font-family:'Bebas Neue',cursive;font-size:1.4rem;color:#fff;letter-spacing:1.5px;}
+.nav-cta{background:var(--verde2);color:#fff;font-size:.88rem;font-weight:700;padding:10px 22px;border:none;border-radius:40px;cursor:pointer;text-decoration:none;transition:background .15s;}
+.nav-cta:hover{background:#16a34a;}
+
+.hero{min-height:100vh;background:var(--ve);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 100px;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(34,197,94,.18),transparent 70%);pointer-events:none;}
+.palm{position:absolute;font-size:9rem;opacity:.06;pointer-events:none;user-select:none;}
+.palm-l{left:-40px;bottom:60px;transform:rotate(-15deg);font-size:12rem;}
+.palm-r{right:-40px;top:80px;transform:rotate(20deg);font-size:11rem;}
+
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);border-radius:40px;padding:8px 20px;font-size:.8rem;font-weight:600;color:var(--verde2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:24px;animation:fD .6s ease both;}
+.hero-title{font-family:'Bebas Neue',cursive;font-size:clamp(4rem,13vw,9rem);line-height:.92;color:#fff;letter-spacing:2px;margin-bottom:12px;animation:fD .7s .1s ease both;}
+.hero-title span{color:var(--verde2);}
+.hero-sub{font-size:clamp(.95rem,2.5vw,1.25rem);color:rgba(255,255,255,.65);max-width:520px;line-height:1.65;margin-bottom:40px;animation:fD .7s .2s ease both;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fD .7s .3s ease both;}
+.btn-p{background:var(--verde2);color:#fff;font-size:1.05rem;font-weight:700;padding:17px 38px;border:none;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 24px rgba(34,197,94,.4);}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(34,197,94,.5);}
+.btn-o{background:transparent;color:rgba(255,255,255,.8);font-size:.98rem;font-weight:600;padding:17px 34px;border:1.5px solid rgba(255,255,255,.2);border-radius:50px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:border-color .15s,color .15s;}
+.btn-o:hover{border-color:rgba(255,255,255,.5);color:#fff;}
+.hero-stats{position:absolute;bottom:32px;left:0;right:0;display:flex;justify-content:center;gap:44px;animation:fU .8s .5s ease both;}
+.stat-num{font-family:'Bebas Neue',cursive;font-size:2.2rem;color:#fff;line-height:1;}
+.stat-label{font-size:.74rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:500;}
+
+.mockup-sec{background:var(--ve);padding:0 24px 80px;display:flex;justify-content:center;}
+.ph-wrap{position:relative;animation:float 4s ease-in-out infinite;}
+.ph-out{width:270px;background:#111;border-radius:42px;padding:13px;box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);}
+.ph-sc{background:#f0f7f2;border-radius:30px;overflow:hidden;height:540px;position:relative;}
+.ph-hdr{background:#fff;padding:11px 15px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #d1e8da;}
+.ph-hdr-t{font-weight:800;color:#1e7a45;font-size:.95rem;}
+.ph-hdr-s{font-size:.65rem;color:#6b7280;}
+.ph-body{padding:13px;}
+.ph-card{background:#fff;border:2px solid #d1e8da;border-left:5px solid #27a85f;border-radius:13px;padding:13px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;}
+.ph-card-n{font-weight:800;color:#1e7a45;font-size:.95rem;}
+.ph-card-i{font-size:.72rem;color:#6b7280;margin-top:2px;}
+.ph-card-v{font-size:1.05rem;font-weight:900;color:#111;}
+.ph-nav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid #d1e8da;display:flex;padding:7px 0 11px;}
+.ph-nav-i{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.58rem;font-weight:700;color:#bbb;text-transform:uppercase;}
+.ph-nav-i.a{color:#1e7a45;}
+.ph-nav-ic{font-size:1.2rem;}
+.glow{position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(34,197,94,.3),transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+
+.sl{font-family:'DM Mono',monospace;font-size:.76rem;font-weight:500;color:var(--verde2);text-transform:uppercase;letter-spacing:2px;margin-bottom:11px;}
+.st{font-family:'Bebas Neue',cursive;font-size:clamp(2.4rem,7vw,4.2rem);line-height:1;color:var(--tx);letter-spacing:1px;margin-bottom:14px;}
+.sd{font-size:1rem;color:var(--ci);line-height:1.7;max-width:500px;}
+
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;margin-top:48px;}
+.fc{background:#fff;border:1.5px solid #d1e8da;border-radius:22px;padding:28px 24px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.fc:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(30,122,69,.1);}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--verde2),var(--am));border-radius:22px 22px 0 0;}
+.fi{font-size:2.2rem;margin-bottom:16px;display:block;}
+.ft{font-size:1.15rem;font-weight:800;color:var(--tx);margin-bottom:9px;}
+.fd{font-size:.92rem;color:var(--ci);line-height:1.65;}
+
+.hw-sec{background:linear-gradient(135deg,var(--ve),#0c2e18);padding:80px 24px;}
+.steps{display:flex;flex-direction:column;margin-top:48px;max-width:620px;margin-left:auto;margin-right:auto;}
+.step{display:flex;gap:22px;align-items:flex-start;padding:26px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+.step:last-child{border-bottom:none;}
+.sn{font-family:'Bebas Neue',cursive;font-size:3.2rem;color:var(--verde2);line-height:1;min-width:56px;opacity:.7;}
+.sc-t{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:7px;}
+.sc-d{font-size:.92rem;color:rgba(255,255,255,.55);line-height:1.6;}
+
+.tg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;margin-top:48px;}
+.tc{background:#fff;border:1.5px solid #e2f0e8;border-radius:18px;padding:26px;}
+.ts{color:var(--am);font-size:1rem;margin-bottom:12px;}
+.tt{font-size:.94rem;color:var(--tx);line-height:1.7;font-style:italic;margin-bottom:18px;}
+.ta{display:flex;align-items:center;gap:10px;}
+.tav{width:42px;height:42px;border-radius:50%;background:var(--verde3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.tn{font-weight:700;font-size:.92rem;}
+.tr{font-size:.75rem;color:var(--ci);margin-top:2px;}
+
+.pr-av{background:#fffbeb;border-left:4px solid var(--am);border-radius:10px;padding:13px 18px;font-size:.93rem;color:#78350f;font-weight:500;max-width:900px;margin:0 auto 44px;display:flex;align-items:center;gap:9px;}
+.prg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;max-width:880px;margin:0 auto;}
+.pc{background:#fff;border:1.5px solid #d1e8da;border-radius:22px;padding:32px 24px;display:flex;flex-direction:column;position:relative;transition:transform .2s,box-shadow .2s;}
+.pc:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(30,122,69,.1);}
+.pc.d{background:var(--ve);border-color:var(--verde2);transform:scale(1.03);box-shadow:0 20px 60px rgba(34,197,94,.25);}
+.pc.d:hover{transform:scale(1.03) translateY(-4px);}
+.ptb{background:var(--am);color:#000;font-weight:800;font-size:.73rem;letter-spacing:1px;text-transform:uppercase;padding:5px 13px;border-radius:40px;display:inline-flex;align-items:center;gap:5px;position:absolute;top:-13px;left:50%;transform:translateX(-50%);white-space:nowrap;}
+.pn{font-size:1.15rem;font-weight:800;color:var(--tx);text-align:center;margin-bottom:6px;margin-top:10px;}
+.pc.d .pn{color:#fff;}
+.pp{font-family:'Bebas Neue',cursive;font-size:3.8rem;color:var(--verde);line-height:1;text-align:center;margin:12px 0 4px;}
+.pc.d .pp{color:var(--am);}
+.pp sub{font-family:'DM Sans',sans-serif;font-size:1.1rem;font-weight:700;vertical-align:middle;}
+.ppd{font-size:.82rem;color:var(--ci);text-align:center;margin-bottom:22px;}
+.pc.d .ppd{color:rgba(255,255,255,.55);}
+.pdiv{border:none;border-top:1.5px solid #e2f0e8;margin-bottom:18px;}
+.pc.d .pdiv{border-color:rgba(255,255,255,.12);}
+.pfl{list-style:none;margin-bottom:26px;flex:1;}
+.pfl li{padding:8px 0;font-size:.92rem;color:var(--tx);display:flex;align-items:flex-start;gap:9px;border-bottom:1px solid #f0f0f0;}
+.pfl li:last-child{border-bottom:none;}
+.pc.d .pfl li{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.08);}
+.pck{color:var(--verde2);font-weight:800;flex-shrink:0;}
+.pb{width:100%;border:none;border-radius:12px;padding:16px;font-size:1rem;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;transition:transform .1s;background:var(--verde2);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.3);}
+.pb:hover{transform:translateY(-2px);}
+.pb.ci{background:#f0f0f0;color:#374151;box-shadow:none;}
+.pb.ci:hover{background:#e0e0e0;}
+
+.cta-sec{background:var(--ve);text-align:center;padding:100px 24px;position:relative;overflow:hidden;}
+.cta-sec::before{content:'📋';position:absolute;font-size:18rem;opacity:.04;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;}
+footer{background:#060e08;padding:28px 24px;text-align:center;color:rgba(255,255,255,.3);font-size:.82rem;}
+
+@keyframes fD{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fU{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.rv.vis{opacity:1;transform:translateY(0);}
+
+/* ===== DEMO WRAPPER ===== */
+#demo-wrap{max-width:480px;margin:44px auto 0;border-radius:26px;overflow:hidden;box-shadow:0 20px 70px rgba(15,61,33,.3),0 0 0 1.5px rgba(34,197,94,.2);}
+#demo-wrap::before{content:'🎮  MODO DEMONSTRAÇÃO — use à vontade!';display:block;background:var(--am);color:#000;text-align:center;font-size:.76rem;font-weight:800;letter-spacing:.8px;padding:9px 12px;font-family:'DM Sans',sans-serif;}
+
+/* ===== APP ESTILOS ===== */
+.A{font-family:'Inter',Arial,sans-serif;background:#f0f7f2;color:#111;min-height:500px;padding-bottom:68px;position:relative;}
+.A *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+.Ahdr{background:#fff;border-bottom:1px solid #d1e8da;padding:13px 16px;display:flex;align-items:center;gap:9px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.Ahdr h1{font-size:1.05rem;font-weight:900;color:#1e7a45;}
+.Ahdr p{font-size:.72rem;color:#6b7280;}
+.Apg{display:none;padding:13px;}
+.Apg.on{display:block;}
+.Atit{text-align:center;margin-bottom:16px;padding-top:3px;}
+.Atit h2{font-size:1.15rem;font-weight:900;color:#1e7a45;}
+.Atit p{font-size:.83rem;color:#6b7280;margin-top:3px;}
+.Albl{font-size:.92rem;font-weight:700;color:#6b7280;margin-bottom:5px;display:block;}
+.Ainp{width:100%;padding:14px;border:2.5px solid #d1e8da;border-radius:12px;font-size:1.1rem;font-family:inherit;background:#fff;color:#111;outline:none;margin-bottom:12px;transition:border .2s;}
+.Ainp:focus{border-color:#27a85f;}
+.Ainp::placeholder{color:#bbb;}
+.Abtn{width:100%;border:none;border-radius:13px;padding:16px;font-size:1.05rem;font-weight:800;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s;margin-bottom:9px;}
+.Abtn:active{transform:scale(.97);}
+.Abtn.g{background:#27a85f;color:#fff;}
+.Abtn.g:hover{background:#1e7a45;}
+.Abtn.r{background:#dc2626;color:#fff;}
+.Abtn.z{background:#e5e7eb;color:#374151;font-size:.92rem;padding:12px;}
+.Anav{position:sticky;bottom:0;background:#fff;border-top:2px solid #d1e8da;display:flex;z-index:50;}
+.Anb{flex:1;border:none;background:transparent;padding:8px 3px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-family:inherit;transition:background .12s;}
+.Anb:hover{background:#f0f7f2;}
+.Anb .ni{font-size:1.35rem;}
+.Anb .nl{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#bbb;}
+.Anb.on .nl{color:#1e7a45;}
+.Abdg{background:#27a85f;color:#fff;border-radius:20px;font-size:.62rem;font-weight:800;padding:1px 6px;margin-left:2px;}
+.Acc{background:#fff;border:2px solid #d1e8da;border-left:6px solid #27a85f;border-radius:13px;padding:15px 16px;margin-bottom:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:transform .1s;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.Acc:active{transform:scale(.98);}
+.Acn{font-size:1.05rem;font-weight:900;color:#1e7a45;}
+.Aci{font-size:.8rem;color:#6b7280;margin-top:3px;}
+.Act{font-size:1.15rem;font-weight:900;color:#111;}
+.Arg{background:#27a85f;color:#fff;border-radius:14px;padding:18px;text-align:center;margin-bottom:10px;}
+.Arg .rl{font-size:.8rem;font-weight:700;opacity:.85;margin-bottom:3px;}
+.Arg .rv{font-size:2rem;font-weight:900;}
+.Agrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;}
+.Arc{background:#fff;border:2px solid #d1e8da;border-radius:11px;padding:13px 9px;text-align:center;}
+.Arc .rl{font-size:.68rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.Arc .rv{font-size:1.15rem;font-weight:900;color:#1e7a45;}
+.Ara{flex:1;border:2px solid #d1e8da;border-radius:9px;background:#fff;color:#6b7280;font-family:inherit;font-size:.72rem;font-weight:800;padding:8px 2px;cursor:pointer;transition:all .15s;}
+.Ara.on{background:#27a85f;color:#fff;border-color:#27a85f;}
+.Arl{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #f0f0f0;}
+.Arl:last-child{border-bottom:none;}
+.Arle{font-weight:700;font-size:.93rem;}
+.Arls{font-size:.73rem;color:#6b7280;margin-top:2px;font-weight:600;}
+.Arlv{font-weight:900;color:#1e7a45;font-size:.98rem;text-align:right;}
+.Aov{display:none;position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-end;justify-content:center;}
+.Aov.on{display:flex;}
+.Amo{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:88%;display:flex;flex-direction:column;animation:aUp .22s ease;}
+.Amof{padding:9px 15px 0;background:#fff;border-radius:20px 20px 0 0;flex-shrink:0;border-bottom:1px solid #d1e8da;padding-bottom:9px;}
+.Amos{overflow-y:auto;padding:11px 15px 30px;flex:1;}
+@keyframes aUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.Adrg{width:38px;height:4px;background:#ddd;border-radius:4px;margin:0 auto 12px;}
+.Amhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.Amn{font-size:1.05rem;font-weight:900;color:#1e7a45;}
+.Abfc{background:#f0f0f0;border:none;border-radius:50%;width:32px;height:32px;font-size:.8rem;cursor:pointer;font-weight:700;color:#666;}
+.Ams{font-size:.8rem;color:#6b7280;margin-bottom:12px;}
+.Acat{display:flex;gap:6px;overflow-x:auto;padding-bottom:7px;margin-bottom:11px;scrollbar-width:none;}
+.Acat::-webkit-scrollbar{display:none;}
+.Acb{flex-shrink:0;background:#f0f0f0;border:2px solid transparent;border-radius:26px;padding:8px 14px;font-size:.88rem;font-weight:700;cursor:pointer;color:#555;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.Acb.on{background:#e0f2ea;border-color:#7dd3a8;color:#1e7a45;}
+.Apc{background:#f0f7f2;border:2px solid #d1e8da;border-radius:13px;padding:13px;margin-bottom:9px;}
+.Apn{font-size:.97rem;font-weight:800;color:#111;}
+.App{font-size:.87rem;font-weight:700;color:#1e7a45;margin-top:2px;}
+.Apb{display:flex;align-items:center;gap:8px;margin-top:11px;}
+.Apct{display:flex;align-items:center;background:#fff;border:2px solid #d1e8da;border-radius:11px;overflow:hidden;flex:1;}
+.Abp{background:none;border:none;height:46px;flex:1;font-size:1.4rem;font-weight:900;cursor:pointer;color:#1e7a45;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:background .12s;}
+.Abp:hover{background:#e0f2ea;}
+.Abp.m{color:#dc2626;}
+.Abp:disabled{color:#ddd;cursor:default;}
+.Apqn{font-size:1.15rem;font-weight:900;min-width:36px;text-align:center;color:#111;}
+.Abcf{background:#27a85f;color:#fff;border:none;border-radius:11px;width:46px;height:46px;font-size:1.3rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .12s,transform .1s;flex-shrink:0;}
+.Abcf:hover{background:#1e7a45;}
+.Abcf:active{transform:scale(.94);}
+.Abcf:disabled{background:#ccc;cursor:default;}
+.Asl{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#9ca3af;margin:14px 0 8px;}
+.Ait{display:flex;align-items:center;padding:11px 0;border-bottom:1px dashed #e5e7eb;gap:7px;}
+.Aitn{flex:1;font-weight:700;font-size:.92rem;}
+.Aitp{color:#1e7a45;font-weight:800;font-size:.92rem;min-width:62px;text-align:right;}
+.Aqc{display:flex;align-items:center;background:#f3f4f6;border-radius:9px;overflow:hidden;}
+.Abq{background:none;border:none;width:34px;height:34px;font-size:1.15rem;font-weight:800;cursor:pointer;color:#1e7a45;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:background .12s;}
+.Abq:hover{background:#e5e7eb;}
+.Abq.m{color:#dc2626;}
+.Aqn{font-size:.97rem;font-weight:900;min-width:26px;text-align:center;}
+.Atb{background:#e0f2ea;border:2px solid #7dd3a8;border-radius:11px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin:13px 0;}
+.Atbl{font-size:.92rem;font-weight:700;color:#1e7a45;}
+.Atbv{font-size:1.3rem;font-weight:900;color:#1e7a45;}
+.Aco{display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:15px;}
+.Aco.on{display:flex;}
+.Acob{background:#fff;border-radius:20px;width:100%;max-width:360px;padding:26px 18px;text-align:center;animation:aUp .22s ease;}
+.Acot{font-size:2.6rem;font-weight:900;color:#1e7a45;margin-bottom:22px;line-height:1;}
+.Acop1{width:100%;background:#27a85f;color:#fff;border:none;border-radius:13px;padding:18px;font-size:1.1rem;font-weight:900;cursor:pointer;font-family:inherit;margin-bottom:9px;transition:background .12s;}
+.Acop1:hover{background:#1e7a45;}
+.Acop2{width:100%;background:#fff3cd;color:#856404;border:2px solid #ffc107;border-radius:13px;padding:14px;font-size:.95rem;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:9px;}
+.Acop3{width:100%;background:#f3f4f6;color:#374151;border:none;border-radius:11px;padding:12px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.Adov{display:none;position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;padding:18px;}
+.Adov.on{display:flex;}
+.Adob{background:#fff;border-radius:18px;width:100%;max-width:320px;padding:24px 18px 18px;text-align:center;animation:aUp .2s ease;}
+.Adoi{font-size:2rem;margin-bottom:7px;}
+.Adom{font-size:.97rem;font-weight:700;color:#111;margin-bottom:18px;line-height:1.5;}
+.Adobt{width:100%;border:none;border-radius:11px;padding:13px;font-size:.97rem;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:6px;transition:opacity .15s;}
+.Adobt.g{background:#27a85f;color:#fff;}
+.Adobt.r{background:#dc2626;color:#fff;}
+.Adobt.z{background:#e5e7eb;color:#374151;}
+.Anot{display:none;position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:15px;}
+.Anot.on{display:flex;}
+.Anotb{background:#fff;border-radius:18px;width:100%;max-width:340px;max-height:80%;overflow-y:auto;padding:20px 16px;animation:aUp .2s ease;}
+.Avz{text-align:center;color:#bbb;padding:20px 0;font-size:.92rem;}
+
+@media(max-width:640px){
+  .hero-stats{gap:26px;}
+  .stat-num{font-size:2rem;}
+  nav{padding:13px 18px;}
+  .fg,.tg{grid-template-columns:1fr;}
+  .pc.d{transform:scale(1);}
+  .pc.d:hover{transform:translateY(-4px);}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">📋 Comanda Digital</div>
+  <a href="#demo" class="nav-cta">Testar grátis</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="palm palm-l">🌿</div>
+  <div class="palm palm-r">🌿</div>
+  <div class="badge">✨ Personalizado para o seu estabelecimento</div>
+  <h1 class="hero-title">Comanda<br><span>Digital</span><br>Profissional</h1>
+  <p class="hero-sub">Chega de papel perdido e confusão no caixa. Controle o consumo dos seus clientes em tempo real — tudo no celular.</p>
+  <div class="hero-btns">
+    <a href="#demo" class="btn-p">✅ Testar agora — grátis</a>
+    <a href="#func" class="btn-o">🎯 Ver recursos</a>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-num">100%</div><div class="stat-label">No celular</div></div>
+    <div><div class="stat-num">0</div><div class="stat-label">Papel & confusão</div></div>
+    <div><div class="stat-num">∞</div><div class="stat-label">Comandas simultâneas</div></div>
+  </div>
+</section>
+
+<!-- MOCKUP -->
+<div class="mockup-sec">
+  <div class="ph-wrap">
+    <div class="glow"></div>
+    <div class="ph-out">
+      <div class="ph-sc">
+        <div class="ph-hdr"><div style="font-size:1.2rem">📋</div><div><div class="ph-hdr-t">Estabelecimento X</div><div class="ph-hdr-s">(sistema de comandas)</div></div></div>
+        <div class="ph-body">
+          <div style="font-size:.68rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">3 comandas abertas</div>
+          <div class="ph-card"><div><div class="ph-card-n">Aline</div><div class="ph-card-i">🛒 3 itens</div></div><div class="ph-card-v">R$ 67,00</div></div>
+          <div class="ph-card"><div><div class="ph-card-n">Mesa 4 — João</div><div class="ph-card-i">🛒 5 itens</div></div><div class="ph-card-v">R$ 134,50</div></div>
+          <div class="ph-card" style="border-left-color:#fbbf24"><div><div class="ph-card-n">Turma da Marina</div><div class="ph-card-i">🛒 8 itens</div></div><div class="ph-card-v">R$ 242,00</div></div>
+          <div style="background:#e0f2ea;border:2px solid #7dd3a8;border-radius:10px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;margin-top:4px"><span style="font-size:.8rem;font-weight:700;color:#1e7a45">💰 Total do dia</span><span style="font-size:1.05rem;font-weight:900;color:#1e7a45">R$ 443,50</span></div>
+        </div>
+        <div class="ph-nav">
+          <div class="ph-nav-i"><div class="ph-nav-ic">+</div><div>Nova</div></div>
+          <div class="ph-nav-i a"><div class="ph-nav-ic">📋</div><div>Abertas</div></div>
+          <div class="ph-nav-i"><div class="ph-nav-ic">📊</div><div>Resumo</div></div>
+          <div class="ph-nav-i"><div class="ph-nav-ic">📈</div><div>Relatório</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="func" style="padding:80px 24px;max-width:1080px;margin:0 auto;">
+  <div class="rv"><div class="sl">Funcionalidades</div><h2 class="st">Tudo que você precisa,<br>sem complicação</h2><p class="sd">Um app completo que cabe no bolso. Sem mensalidade cara, sem treinamento longo.</p></div>
+  <div class="fg">
+    <div class="fc rv"><span class="fi">🛒</span><div class="ft">Controle de Consumo</div><div class="fd">Registre tudo que o cliente consome e acompanhe o total em tempo real. Simples, rápido e sem erros.</div></div>
+    <div class="fc rv"><span class="fi">🍽️</span><div class="ft">Cardápio Personalizável</div><div class="fd">Adicione, edite e remova produtos por categoria. O cardápio é seu, do seu jeito, com seus preços.</div></div>
+    <div class="fc rv"><span class="fi">📊</span><div class="ft">Relatórios Detalhados</div><div class="fd">Veja o faturamento por dia, mês e ano. Saiba o que mais vende e quanto entrou no caixa.</div></div>
+    <div class="fc rv"><span class="fi">🔐</span><div class="ft">Proteção com PIN</div><div class="fd">Acesso protegido por senha de 4 dígitos. Só quem você autorizar mexe no sistema.</div></div>
+    <div class="fc rv"><span class="fi">📤</span><div class="ft">Compartilhar Relatório</div><div class="fd">Exporte e compartilhe o resumo do dia direto pelo WhatsApp ou salve como imagem.</div></div>
+    <div class="fc rv"><span class="fi">📱</span><div class="ft">Funciona Offline</div><div class="fd">Sem internet? Sem problema. O app salva tudo no próprio celular. Não perde nada.</div></div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="hw-sec">
+  <div style="max-width:620px;margin:0 auto;">
+    <div class="rv"><div class="sl" style="color:rgba(255,255,255,.4)">Como funciona</div><h2 class="st" style="color:#fff">Simples do início<br>ao fim</h2><p class="sd" style="color:rgba(255,255,255,.6)">Em menos de 2 minutos você já está controlando tudo.</p></div>
+    <div class="steps">
+      <div class="step rv"><div class="sn">01</div><div><div class="sc-t">Abre a comanda do cliente</div><div class="sc-d">Digite o nome e a comanda está aberta — pronta para registrar qualquer consumo.</div></div></div>
+      <div class="step rv"><div class="sn">02</div><div><div class="sc-t">Adiciona o que o cliente pediu</div><div class="sc-d">Toque no produto e confirme. Tudo vai somando na comanda automaticamente.</div></div></div>
+      <div class="step rv"><div class="sn">03</div><div><div class="sc-t">Na hora de fechar, é na hora</div><div class="sc-d">Toque em "Cobrar", mostra o total pro cliente e confirma o pagamento.</div></div></div>
+      <div class="step rv"><div class="sn">04</div><div><div class="sc-t">Acompanha o caixa em tempo real</div><div class="sc-d">A tela de resumo mostra quanto entrou hoje, no mês, no ano. Transparente e sem surpresas.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO COMPLETA -->
+<section id="demo" style="background:#f0fdf4;padding:80px 24px;text-align:center;">
+  <div class="rv">
+    <div class="sl">Demonstração completa</div>
+    <h2 class="st">O app real,<br>na sua tela agora</h2>
+    <p class="sd" style="margin:0 auto;">Abra comandas, adicione itens do cardápio, feche e veja os relatórios — tudo funcionando de verdade.</p>
+  </div>
+
+  <div id="demo-wrap" class="rv">
+    <div class="A" id="Aroot">
+
+      <div class="Ahdr">
+        <span style="font-size:1.4rem">📋</span>
+        <div style="flex:1"><h1>Estabelecimento X</h1><p>(sistema de comandas)</p></div>
+        <button onclick="A('config')" style="background:none;border:none;cursor:pointer;font-size:1.25rem;padding:3px" title="Configurações">⚙️</button>
+      </div>
+
+      <!-- NOVA -->
+      <div id="Apg-nova" class="Apg on">
+        <div class="Atit"><h2>📋 Nova Comanda</h2><p>Digite o nome e toque em Abrir</p></div>
+        <label class="Albl">👤 Nome do cliente</label>
+        <input class="Ainp" id="Anome" type="text" placeholder="Ex: Aline, Mesa 4, João...">
+        <button class="Abtn g" onclick="Aabrir()">✅ Abrir Comanda</button>
+      </div>
+
+      <!-- ABERTAS -->
+      <div id="Apg-abertas" class="Apg">
+        <div class="Atit"><h2>📂 Comandas Abertas</h2><p>Toque numa comanda para adicionar itens</p></div>
+        <div id="Alist"><div class="Avz">Nenhuma comanda aberta</div></div>
+      </div>
+
+      <!-- RESUMO -->
+      <div id="Apg-resumo" class="Apg">
+        <div class="Atit"><h2>📊 Resumo</h2></div>
+        <div class="Arg"><div class="rl">💰 Faturamento de hoje</div><div class="rv" id="Ar-hj">R$ 0,00</div></div>
+        <div class="Agrid">
+          <div class="Arc"><div class="rl">📅 Este mês</div><div class="rv" id="Ar-ms">R$ 0,00</div></div>
+          <div class="Arc"><div class="rl">📆 Este ano</div><div class="rv" id="Ar-an">R$ 0,00</div></div>
+        </div>
+        <button class="Abtn z" onclick="Alimpar()">🗑️ Limpar histórico da demo</button>
+      </div>
+
+      <!-- RELATÓRIO -->
+      <div id="Apg-relatorio" class="Apg">
+        <div class="Atit"><h2>📋 Relatório</h2></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button class="Ara on" id="Aab-dias"     onclick="Aaba('dias')"    >📅 Dias</button>
+          <button class="Ara"    id="Aab-meses"    onclick="Aaba('meses')"   >📆 Meses</button>
+          <button class="Ara"    id="Aab-comandas" onclick="Aaba('comandas')">🧾 Comandas</button>
+        </div>
+        <div style="background:#fff;border:2px solid #d1e8da;border-radius:13px;padding:14px;min-height:70px">
+          <div id="Aab-dias-c"></div>
+          <div id="Aab-meses-c"    style="display:none"></div>
+          <div id="Aab-comandas-c" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- CONFIG -->
+      <div id="Apg-config" class="Apg">
+        <div class="Atit"><h2>⚙️ Cardápio demo</h2><p>No app real você edita tudo aqui</p></div>
+        <div style="background:#fff;border:2px solid #d1e8da;border-radius:14px;padding:14px;margin-bottom:12px"><div id="Acfg-lista"></div></div>
+        <button class="Abtn z" onclick="A('nova')">← Voltar</button>
+      </div>
+
+      <!-- NAV -->
+      <div class="Anav">
+        <button class="Anb on" id="Anv-nova"     onclick="A('nova')"    ><span class="ni">+</span><span class="nl">Nova</span></button>
+        <button class="Anb"    id="Anv-abertas"  onclick="A('abertas')" ><span class="ni">📋</span><span class="nl">Abertas <span class="Abdg" id="Abdg" style="display:none">0</span></span></button>
+        <button class="Anb"    id="Anv-resumo"   onclick="A('resumo')"  ><span class="ni">📊</span><span class="nl">Resumo</span></button>
+        <button class="Anb"    id="Anv-relatorio"onclick="A('relatorio')"><span class="ni">📈</span><span class="nl">Relatório</span></button>
+      </div>
+
+      <!-- MODAL COMANDA -->
+      <div class="Aov" id="Aov">
+        <div class="Amo">
+          <div class="Amof">
+            <div class="Adrg"></div>
+            <div class="Amhd">
+              <button onclick="Acobrar()" style="background:#27a85f;color:#fff;border:none;border-radius:9px;padding:8px 13px;font-size:.82rem;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;">🏁 Cobrar</button>
+              <div class="Amn" id="Amn">Comanda</div>
+              <button class="Abfc" onclick="Afmo()">✕</button>
+            </div>
+            <div class="Ams" id="Ams"></div>
+            <div class="Acat" id="Acats"></div>
+          </div>
+          <div class="Amos">
+            <div id="Aprods"></div>
+            <div class="Asl">O que está na comanda</div>
+            <div id="Aitens"></div>
+            <div class="Atb"><span class="Atbl">Total</span><span class="Atbv" id="Atot">R$ 0,00</span></div>
+            <button class="Abtn r" onclick="Aexcluir()">🗑️ Excluir esta comanda</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COBRANÇA -->
+      <div class="Aco" id="Aco">
+        <div class="Acob">
+          <div style="font-size:.76rem;font-weight:700;color:#6b7280;margin-bottom:2px">📋 Estabelecimento X</div>
+          <div style="font-size:.78rem;font-weight:700;color:#6b7280;margin-bottom:3px">Comanda de</div>
+          <div style="font-size:.95rem;color:#6b7280;font-weight:700;margin-bottom:4px" id="Aconome">—</div>
+          <div class="Acot" id="Acotot">R$ 0,00</div>
+          <button class="Acop1" onclick="Apago()">✅ PAGO</button>
+          <button class="Acop2" onclick="Afco()">⏳ Ainda não pagou — Voltar</button>
+          <button class="Acop3" onclick="Afco()">← Voltar para a comanda</button>
+        </div>
+      </div>
+
+      <!-- NOTA -->
+      <div class="Anot" id="Anot">
+        <div class="Anotb">
+          <div style="text-align:center;font-size:.8rem;color:#6b7280;font-weight:700;margin-bottom:2px">📋 Estabelecimento X</div>
+          <div style="text-align:center;font-size:1.1rem;font-weight:900;color:#1e7a45;margin-bottom:2px" id="Annotnome"></div>
+          <div style="text-align:center;font-size:.76rem;color:#6b7280;margin-bottom:12px" id="Annotdata"></div>
+          <div style="border-top:2px dashed #d1e8da;border-bottom:2px dashed #d1e8da;padding:9px 0;margin-bottom:11px" id="Annotitens"></div>
+          <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:900;color:#1e7a45;margin-bottom:14px"><span>TOTAL</span><span id="Annottot"></span></div>
+          <button class="Adobt g" onclick="Aimprimir()" style="margin-bottom:7px">🖨️ Imprimir / Compartilhar</button>
+          <button class="Adobt z" onclick="document.getElementById('Anot').classList.remove('on')">← Voltar</button>
+        </div>
+      </div>
+
+      <!-- DIÁLOGO -->
+      <div class="Adov" id="Adov">
+        <div class="Adob">
+          <div class="Adoi" id="Adoi"></div>
+          <div class="Adom" id="Adom"></div>
+          <div id="Adobts"></div>
+        </div>
+      </div>
+
+    </div><!-- /A -->
+  </div><!-- /demo-wrap -->
+
+  <p style="margin-top:26px;color:var(--ci);font-size:.88rem">👆 Esse é o app real. <strong>O que você vê é o que você leva.</strong></p>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:var(--br);padding:80px 24px;max-width:980px;margin:0 auto;">
+  <div class="rv"><div class="sl">Depoimentos</div><h2 class="st">Quem já usa, não troca</h2></div>
+  <div class="tg">
+    <div class="tc rv"><div class="ts">★★★★★</div><div class="tt">"Antes eu controlava tudo no papel e sempre tinha confusão no fechamento. Com o sistema, o caixa bate certinho todo dia."</div><div class="ta"><div class="tav">👩</div><div><div class="tn">Márcia S.</div><div class="tr">Proprietária de bar — Cotia/SP</div></div></div></div>
+    <div class="tc rv"><div class="ts">★★★★★</div><div class="tt">"É muito fácil, até minha atendente mais velha consegue abrir uma comanda sem ajuda. Recomendo pra qualquer estabelecimento."</div><div class="ta"><div class="tav">👨</div><div><div class="tn">Rafael M.</div><div class="tr">Dono de restaurante — Jundiaí/SP</div></div></div></div>
+    <div class="tc rv"><div class="ts">★★★★★</div><div class="tt">"O relatório mensal me ajudou a ver o que mais vende. Ajustei o cardápio e aumentei o lucro sem contratar mais ninguém."</div><div class="ta"><div class="tav">👩</div><div><div class="tn">Claudia F.</div><div class="tr">Lanchonete — Campinas/SP</div></div></div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="precos" style="background:#f0fdf4;padding:80px 24px;">
+  <div style="max-width:880px;margin:0 auto;">
+    <div class="rv" style="text-align:center;margin-bottom:36px;"><div class="sl">Investimento</div><h2 class="st">Quanto custa?</h2></div>
+    <div class="pr-av rv">💡 Sistemas parecidos cobram R$ 150 a R$ 400 por mês e ainda são mais limitados.</div>
+    <div class="prg">
+      <div class="pc rv">
+        <div class="pn">Só a Implantação</div><div class="pp"><sub>R$</sub> 800</div><div class="ppd">pagamento único</div>
+        <hr class="pdiv">
+        <ul class="pfl"><li><span class="pck">✓</span> App com sua logo</li><li><span class="pck">✓</span> Cardápio configurado</li><li><span class="pck">✓</span> Banco na nuvem</li><li><span class="pck">✓</span> Treinamento incluído</li></ul>
+        <button class="pb ci" onclick="window.open('https://wa.me/55?text=Tenho interesse no plano Só a Implantação','_blank')">Quero esse plano</button>
+      </div>
+      <div class="pc d rv">
+        <div class="ptb">⭐ Mais escolhido</div>
+        <div class="pn">Implantação + Suporte</div><div class="pp"><sub>R$</sub> 1.200</div><div class="ppd">+ R$ 150/mês</div>
+        <hr class="pdiv">
+        <ul class="pfl"><li><span class="pck">✓</span> Tudo do plano anterior</li><li><span class="pck">✓</span> Suporte quando precisar</li><li><span class="pck">✓</span> Alterações no cardápio</li><li><span class="pck">✓</span> Atualizações incluídas</li></ul>
+        <button class="pb" onclick="window.open('https://wa.me/55?text=Tenho interesse no plano Implantação + Suporte','_blank')">Quero esse plano</button>
+      </div>
+      <div class="pc rv">
+        <div class="pn">Alteração Avulsa</div><div class="pp"><sub>R$</sub> 100</div><div class="ppd">por alteração</div>
+        <hr class="pdiv">
+        <ul class="pfl"><li><span class="pck">✓</span> Mudar produto / preço</li><li><span class="pck">✓</span> Trocar logo</li><li><span class="pck">✓</span> Ajustes no app</li><li><span class="pck">✓</span> Suporte pontual</li></ul>
+        <button class="pb ci" onclick="window.open('https://wa.me/55?text=Tenho interesse em uma Alteração Avulsa','_blank')">Solicitar alteração</button>
+      </div>
+    </div>
+    <p class="rv" style="text-align:center;margin-top:28px;color:var(--ci);font-size:.86rem;">💳 Pix, cartão ou boleto &nbsp;·&nbsp; 🔒 Entrega após pagamento &nbsp;·&nbsp; 📲 Suporte via WhatsApp</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="rv">
+    <div class="sl" style="color:rgba(255,255,255,.4)">Bora começar?</div>
+    <h2 class="st" style="color:#fff;max-width:660px;margin:0 auto 18px;">Pronto pra acabar com<br>a bagunça das comandas?</h2>
+    <p class="sd" style="color:rgba(255,255,255,.6);max-width:480px;margin:0 auto 40px;">Experimente o app agora e veja como é simples. Sem cadastro, sem cartão.</p>
+    <a href="#demo" class="btn-p" style="display:inline-flex;">✅ Testar o app agora</a>
+  </div>
+</section>
+
+<footer><p>📋 Comanda Digital — Sistema Profissional de Comandas</p><p style="margin-top:5px">Feito com ❤️ no Brasil</p></footer>
+
+<script>
+/* ============================================================
+   APP COMPLETO
+   ============================================================ */
+const ACARDAPIO=[
+  {c:'🍺 Cervejas',n:'Heineken Latinha',p:8},{c:'🍺 Cervejas',n:'Heineken Longneck',p:12},
+  {c:'🍺 Cervejas',n:'Skol',p:5},{c:'🍺 Cervejas',n:'Amstel',p:6},{c:'🍺 Cervejas',n:'Original',p:7},
+  {c:'🍺 Cervejas',n:'Itaipava',p:5},{c:'🍺 Cervejas',n:'Brahma',p:6},{c:'🍺 Cervejas',n:'Ice',p:12},
+  {c:'🍽️ Porções',n:'Peixe Tilápia',p:50},{c:'🍽️ Porções',n:'Frango',p:35},
+  {c:'🍽️ Porções',n:'Mista',p:35},{c:'🍽️ Porções',n:'Mandioca',p:30},
+  {c:'🍽️ Porções',n:'Batata',p:30},{c:'🍽️ Porções',n:'Calabresa',p:35},
+  {c:'🥤 Refrigerantes',n:'Coca Lata',p:7},{c:'🥤 Refrigerantes',n:'Coca Litro',p:12},
+  {c:'🥤 Refrigerantes',n:'Fanta Uva',p:7},{c:'🥤 Refrigerantes',n:'Guaraná',p:7},
+  {c:'🥤 Refrigerantes',n:'Energy Red Bull',p:15},{c:'🥤 Refrigerantes',n:'Suco Polpa',p:10},
+  {c:'🥤 Refrigerantes',n:'Água Mineral',p:5},{c:'🥤 Refrigerantes',n:'Água de Coco',p:5},
+  {c:'🍹 Caipirinhas',n:'Caipirinha Limão c/ Velho Barreiro',p:20},
+  {c:'🍹 Caipirinhas',n:'Caipirinha Limão c/ Vodka',p:25},
+  {c:'🍹 Caipirinhas',n:'Caipirinha Maracujá',p:25},
+  {c:'🥃 Doses',n:'Pinga Curtida (dose)',p:5},{c:'🥃 Doses',n:'Conhaque Dreher (dose)',p:5},
+  {c:'🥃 Doses',n:'Velho Barreiro (dose)',p:5},{c:'🥃 Doses',n:'Vodka Smirnoff (dose)',p:8},
+  {c:'🥃 Doses',n:'Gin (dose)',p:20},{c:'🥃 Doses',n:'Campari (dose)',p:15},
+  {c:'🥃 Doses',n:"Dose Jack Daniel's c/ Red Bull",p:50},
+  {c:'🥃 Doses',n:'Dose Red Label c/ Vibe',p:35},
+  {c:'🍡 Doces e Salgadinhos',n:'Salgadinho',p:5},{c:'🍡 Doces e Salgadinhos',n:'Freegells',p:2},
+  {c:'🍡 Doces e Salgadinhos',n:'Bala',p:0.25},{c:'🍡 Doces e Salgadinhos',n:'Pirulito',p:0.5},
+  {c:'🍦 Sorvete',n:'Picolé',p:7},
+];
+const ACATS=['🍺 Cervejas','🍽️ Porções','🥤 Refrigerantes','🍹 Caipirinhas','🥃 Doses','🍡 Doces e Salgadinhos','🍦 Sorvete'];
+
+let ACs=JSON.parse(sessionStorage.getItem('dc')||'[]');
+let AHs=JSON.parse(sessionStorage.getItem('dh')||'[]');
+let AID=null,ACat=ACATS[0],AAba='dias';
+const AQ={};
+const Asv=()=>{sessionStorage.setItem('dc',JSON.stringify(ACs));sessionStorage.setItem('dh',JSON.stringify(AHs));};
+const Atot=c=>c.i.reduce((s,i)=>s+i.p*(i.q||1),0);
+const Afmt=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const Adia=d=>d.toISOString().slice(0,10);
+const Ames=d=>d.toISOString().slice(0,7);
+const Ahr=d=>d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const Adh=d=>d.toLocaleDateString('pt-BR')+' '+Ahr(d);
+
+function A(pg){
+  document.querySelectorAll('.Apg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.Anb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('Apg-'+pg).classList.add('on');
+  const nb=document.getElementById('Anv-'+pg);
+  if(nb)nb.classList.add('on');
+  if(pg==='abertas')  Arenda();
+  if(pg==='resumo')   Arsum();
+  if(pg==='relatorio')Aaba(AAba);
+  if(pg==='config')   Acfg();
+  Abdg_upd();
+  document.getElementById('Aroot').scrollTop=0;
+}
+function Abdg_upd(){
+  const b=document.getElementById('Abdg');
+  if(ACs.length){b.textContent=ACs.length;b.style.display='inline';}else b.style.display='none';
+}
+function Aabrir(){
+  const n=document.getElementById('Anome').value.trim();
+  if(!n){Adlg({i:'❌',m:'Digite o nome do cliente!',b:[{l:'OK',c:'z',fn:null}]});return;}
+  const c={id:Date.now(),n,i:[],ab:new Date().toISOString()};
+  ACs.push(c);Asv();
+  document.getElementById('Anome').value='';
+  Aomo(c.id);
+}
+function Arenda(){
+  Abdg_upd();
+  const el=document.getElementById('Alist');
+  if(!ACs.length){el.innerHTML='<div class="Avz">Nenhuma comanda aberta</div>';return;}
+  el.innerHTML=ACs.map(c=>{
+    const t=Atot(c),qi=c.i.reduce((s,i)=>s+(i.q||1),0);
+    return '<div class="Acc" onclick="Aomo('+c.id+')">'
+      +'<div><div class="Acn">'+c.n+'</div><div class="Aci">'+qi+' item(s) • '+Ahr(new Date(c.ab))+'</div></div>'
+      +'<div class="Act">R$ '+Afmt(t)+'</div></div>';
+  }).join('');
+}
+function Aomo(id){
+  AID=id;ACat=ACATS[0];Object.keys(AQ).forEach(k=>AQ[k]=0);
+  Armo();document.getElementById('Aov').classList.add('on');
+}
+function Afmo(){document.getElementById('Aov').classList.remove('on');Arenda();}
+function Armo(){
+  const c=ACs.find(x=>x.id===AID);if(!c)return;
+  document.getElementById('Amn').textContent='🧾 '+c.n;
+  document.getElementById('Ams').textContent='Aberta às '+Ahr(new Date(c.ab));
+  document.getElementById('Acats').innerHTML=ACATS.map(ct=>
+    '<button class="Acb'+(ct===ACat?' on':'')+'" onclick="Acatm(\''+ct.replace(/'/g,"\\'")+'\')">'+ ct+'</button>'
+  ).join('');
+  document.getElementById('Aprods').innerHTML=ACARDAPIO.filter(p=>p.c===ACat).map(p=>{
+    const k=p.n.replace(/'/g,"\\'");
+    const s=p.n.replace(/[^a-z0-9]/gi,'_');
+    return '<div class="Apc">'
+      +'<div class="Apn">'+p.n+'</div><div class="App">R$ '+Afmt(p.p)+' cada</div>'
+      +'<div class="Apb"><div class="Apct">'
+      +'<button class="Abp m" id="Am'+s+'" onclick="Apq(\''+k+'\',-1)" disabled>−</button>'
+      +'<div class="Apqn" id="Aq'+s+'">0</div>'
+      +'<button class="Abp" onclick="Apq(\''+k+'\',1)">+</button>'
+      +'</div>'
+      +'<button class="Abcf" id="Ac'+s+'" onclick="Aadi(\''+k+'\','+p.p+')" disabled>✓</button>'
+      +'</div></div>';
+  }).join('');
+  Aritens();
+}
+function Acatm(c){Object.keys(AQ).forEach(k=>AQ[k]=0);ACat=c;Armo();}
+function Apq(n,d){
+  if(!AQ[n])AQ[n]=0;
+  AQ[n]=Math.max(0,AQ[n]+d);
+  const s=n.replace(/[^a-z0-9]/gi,'_');
+  const eq=document.getElementById('Aq'+s),em=document.getElementById('Am'+s),ea=document.getElementById('Ac'+s);
+  if(eq)eq.textContent=AQ[n];
+  if(em)em.disabled=AQ[n]===0;
+  if(ea)ea.disabled=AQ[n]===0;
+}
+function Aadi(n,p){
+  const q=AQ[n]||0;if(!q)return;
+  const c=ACs.find(x=>x.id===AID);
+  const ex=c.i.find(i=>i.n===n&&i.p===p);
+  if(ex)ex.q=(ex.q||1)+q;else c.i.push({n,p,q});
+  AQ[n]=0;Asv();
+  const s=n.replace(/[^a-z0-9]/gi,'_');
+  const eq=document.getElementById('Aq'+s),em=document.getElementById('Am'+s),ea=document.getElementById('Ac'+s);
+  if(eq)eq.textContent='0';if(em)em.disabled=true;if(ea)ea.disabled=true;
+  Aritens();
+}
+function Aritens(){
+  const c=ACs.find(x=>x.id===AID);if(!c)return;
+  const el=document.getElementById('Aitens');
+  if(!c.i.length){el.innerHTML='<div class="Avz">Nenhum item ainda</div>';}
+  else el.innerHTML=c.i.map((it,i)=>
+    '<div class="Ait">'
+    +'<div class="Aitn">'+it.n+'</div>'
+    +'<div class="Aqc"><button class="Abq m" onclick="Armi('+i+')">−</button>'
+    +'<div class="Aqn">'+(it.q||1)+'</div>'
+    +'<button class="Abq" onclick="Aaqi('+i+')">+</button></div>'
+    +'<div class="Aitp">R$ '+Afmt(it.p*(it.q||1))+'</div></div>'
+  ).join('');
+  document.getElementById('Atot').textContent='R$ '+Afmt(Atot(c));
+}
+function Aaqi(i){const c=ACs.find(x=>x.id===AID);c.i[i].q=(c.i[i].q||1)+1;Asv();Aritens();}
+function Armi(i){
+  const c=ACs.find(x=>x.id===AID);const it=c.i[i];
+  if((it.q||1)>1){it.q--;Asv();Aritens();}
+  else Adlg({i:'🗑️',m:'Remover "'+it.n+'" da comanda?',b:[
+    {l:'Sim, remover',c:'r',fn:()=>{c.i.splice(i,1);Asv();Aritens();}},
+    {l:'Cancelar',c:'z',fn:null}
+  ]});
+}
+function Aexcluir(){
+  const c=ACs.find(x=>x.id===AID);if(!c)return;
+  Adlg({i:'🗑️',m:'Excluir a comanda de '+c.n+'?',b:[
+    {l:'Sim, excluir',c:'r',fn:()=>{ACs=ACs.filter(x=>x.id!==AID);AID=null;Asv();Afmo();}},
+    {l:'Cancelar',c:'z',fn:null}
+  ]});
+}
+function Acobrar(){
+  const c=ACs.find(x=>x.id===AID);if(!c)return;
+  document.getElementById('Aconome').textContent=c.n;
+  document.getElementById('Acotot').textContent='R$ '+Afmt(Atot(c));
+  document.getElementById('Aco').classList.add('on');
+}
+function Afco(){document.getElementById('Aco').classList.remove('on');}
+function Apago(){
+  const c=ACs.find(x=>x.id===AID);if(!c)return;
+  const t=Atot(c),nc=c.n;
+  AHs.push({n:nc,i:c.i.map(x=>Object.assign({},x)),t,d:new Date().toISOString()});
+  ACs=ACs.filter(x=>x.id!==AID);AID=null;Asv();
+  document.getElementById('Aco').classList.remove('on');
+  document.getElementById('Aov').classList.remove('on');
+  Arenda();
+  Adlg({i:'✅',m:'Comanda de '+nc+' fechada!\nTotal: R$ '+Afmt(t),b:[{l:'OK',c:'g',fn:null}]});
+}
+function Arsum(){
+  const hj=Adia(new Date()),ms=Ames(new Date()),an=new Date().getFullYear();
+  const hhj=AHs.filter(h=>Adia(new Date(h.d))===hj);
+  const thj=hhj.reduce((s,h)=>s+h.t,0);
+  const tms=AHs.filter(h=>Ames(new Date(h.d))===ms).reduce((s,h)=>s+h.t,0);
+  const tan=AHs.filter(h=>new Date(h.d).getFullYear()===an).reduce((s,h)=>s+h.t,0);
+  document.getElementById('Ar-hj').textContent='R$ '+Afmt(thj);
+  document.getElementById('Ar-ms').textContent='R$ '+Afmt(tms);
+  document.getElementById('Ar-an').textContent='R$ '+Afmt(tan);
+}
+function Alimpar(){
+  Adlg({i:'🗑️',m:'Apagar todo o histórico da demo?',b:[
+    {l:'Sim, apagar',c:'r',fn:()=>{AHs=[];ACs=[];Asv();Arsum();Aaba(AAba);Abdg_upd();}},
+    {l:'Cancelar',c:'z',fn:null}
+  ]});
+}
+function Aaba(ab){
+  AAba=ab;
+  document.querySelectorAll('.Ara').forEach(b=>b.classList.remove('on'));
+  document.getElementById('Aab-'+ab).classList.add('on');
+  ['dias','meses','comandas'].forEach(a=>document.getElementById('Aab-'+a+'-c').style.display=a===ab?'':'none');
+  if(ab==='dias')    Aabdias();
+  if(ab==='meses')   Aabmeses();
+  if(ab==='comandas')Aabcmd();
+}
+function Aabdias(){
+  const el=document.getElementById('Aab-dias-c');
+  if(!AHs.length){el.innerHTML='<div class="Avz">Nenhuma comanda fechada ainda</div>';return;}
+  const pd={};AHs.forEach(h=>{const d=Adia(new Date(h.d));if(!pd[d]){pd[d]={t:0,q:0};}pd[d].t+=h.t;pd[d].q++;});
+  el.innerHTML=Object.keys(pd).sort().reverse().map(d=>{
+    const v=pd[d];const dt=new Date(d+'T12:00:00');
+    const lbl=dt.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'});
+    return '<div class="Arl"><div><div class="Arle">'+lbl+'</div><div class="Arls">'+v.q+' comanda(s)</div></div><div class="Arlv">R$ '+Afmt(v.t)+'</div></div>';
+  }).join('');
+}
+function Aabmeses(){
+  const el=document.getElementById('Aab-meses-c');
+  if(!AHs.length){el.innerHTML='<div class="Avz">Nenhuma comanda fechada ainda</div>';return;}
+  const pm={};AHs.forEach(h=>{const m=Ames(new Date(h.d));if(!pm[m]){pm[m]={t:0,q:0};}pm[m].t+=h.t;pm[m].q++;});
+  const nm=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  el.innerHTML=Object.keys(pm).sort().reverse().map(m=>{
+    const v=pm[m];const[ano,mes]=m.split('-');
+    return '<div class="Arl"><div><div class="Arle">'+nm[parseInt(mes)-1]+' '+ano+'</div><div class="Arls">'+v.q+' comanda(s)</div></div><div class="Arlv">R$ '+Afmt(v.t)+'</div></div>';
+  }).join('');
+}
+function Aabcmd(){
+  const el=document.getElementById('Aab-comandas-c');
+  if(!AHs.length){el.innerHTML='<div class="Avz">Nenhuma comanda fechada ainda</div>';return;}
+  el.innerHTML=AHs.slice().reverse().map((h,i)=>{
+    const idx=AHs.length-1-i;
+    return '<div class="Arl" onclick="Anota('+idx+')" style="cursor:pointer"><div><div class="Arle">'+h.n+'</div><div class="Arls">'+Adh(new Date(h.d))+' • 🧾 ver nota</div></div><div class="Arlv">R$ '+Afmt(h.t)+'</div></div>';
+  }).join('');
+}
+function Anota(idx){
+  const h=AHs[idx];if(!h)return;
+  window._nidx=idx;
+  document.getElementById('Annotnome').textContent='🧾 '+h.n;
+  document.getElementById('Annotdata').textContent=Adh(new Date(h.d));
+  document.getElementById('Annotitens').innerHTML=h.i.map(it=>
+    '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:.9rem">'
+    +'<span style="font-weight:600">'+it.n+(it.q>1?' <span style="color:#6b7280">×'+it.q+'</span>':'')+'</span>'
+    +'<span style="font-weight:800;color:#1e7a45">R$ '+Afmt(it.p*(it.q||1))+'</span></div>'
+  ).join('');
+  document.getElementById('Annottot').textContent='R$ '+Afmt(h.t);
+  document.getElementById('Anot').classList.add('on');
+}
+async function Aimprimir(){
+  const h=AHs[window._nidx];if(!h)return;
+  const ls=['📋 Estabelecimento X','🧾 '+h.n,Adh(new Date(h.d)),'─────────────────────',
+    ...h.i.map(it=>it.n+(it.q>1?' ×'+it.q:'')+' → R$ '+Afmt(it.p*(it.q||1))),
+    '─────────────────────','TOTAL: R$ '+Afmt(h.t)];
+  const txt=ls.join('\n');
+  if(navigator.share){try{await navigator.share({title:'Notinha — '+h.n,text:txt});return;}catch(e){}}
+  try{await navigator.clipboard.writeText(txt);Adlg({i:'📋',m:'Notinha copiada!\nCole no WhatsApp.',b:[{l:'OK',c:'g',fn:null}]});}catch(e){}
+}
+function Acfg(){
+  const ct={};ACARDAPIO.forEach(p=>{ct[p.c]=(ct[p.c]||0)+1;});
+  document.getElementById('Acfg-lista').innerHTML=ACATS.map(c=>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0">'
+    +'<span style="font-weight:700;font-size:.92rem">'+c+'</span>'
+    +'<span style="font-size:.8rem;color:#1e7a45;font-weight:700">'+ct[c]+' produtos</span></div>'
+  ).join('');
+}
+function Adlg({i,m,b}){
+  document.getElementById('Adoi').textContent=i||'';
+  document.getElementById('Adom').innerHTML=m.replace(/\n/g,'<br>');
+  document.getElementById('Adobts').innerHTML=b.map((x,idx)=>
+    '<button class="Adobt '+x.c+'" onclick="Afdlg('+idx+')">'+x.l+'</button>'
+  ).join('');
+  window._Adcbs=b.map(x=>x.fn);
+  document.getElementById('Adov').classList.add('on');
+}
+function Afdlg(idx){
+  document.getElementById('Adov').classList.remove('on');
+  const cb=window._Adcbs&&window._Adcbs[idx];if(cb)cb();
+}
+
+Abdg_upd();
+
+/* ===== SCROLL REVEAL ===== */
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      e.target.style.transitionDelay=(i*.07)+'s';
+      e.target.classList.add('vis');
+      obs.unobserve(e.target);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
