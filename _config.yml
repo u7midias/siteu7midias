@@ -1,0 +1,50 @@
+# Configuração do site U7 Mídias (GitHub Pages + Jekyll)
+# O index.html, comanda.html e painelcomanda.html continuam funcionando como sempre.
+# Este arquivo liga a seção de notícias em /noticias/.
+
+title: U7 Mídias
+description: Notícias de delivery, redes sociais e tecnologia explicadas para o dono de pequeno negócio.
+url: https://u7midias.marketing
+lang: pt_BR
+timezone: America/Sao_Paulo
+
+# Endereço de cada matéria: u7midias.marketing/noticias/nome-da-materia/
+permalink: /noticias/:title/
+
+# WhatsApp da U7 usado nos botões das matérias
+whatsapp: "5511934121551"
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+feed:
+  path: noticias/feed.xml
+
+logo: /assets/img/logo-u7.jpg
+
+social:
+  name: U7 Mídias
+  links:
+    - https://instagram.com/u7midias
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: materia
+  - scope:
+      path: "painelcomanda.html"
+    values:
+      sitemap: false
+  - scope:
+      path: "comanda.html"
+    values:
+      sitemap: false
+
+exclude:
+  - README.md
+  - COMO-PUBLICAR.md
+  - modelo-de-materia.md

@@ -1,0 +1,62 @@
+---
+layout: base-noticias
+title: Notícias
+description: Notícias de delivery, redes sociais e tecnologia explicadas para o dono de pequeno negócio. Toda segunda tem matéria nova.
+permalink: /noticias/
+---
+{%- assign categorias = "Delivery e apps,Redes sociais,IA e tecnologia,Dicas de venda" | split: "," -%}
+<header class="noticias-topo">
+  <div class="wrap">
+    <div class="eyebrow">Notícias U7</div>
+    <h1>O que mudou essa semana e o que isso muda pro seu negócio</h1>
+    <p>Delivery, redes sociais e tecnologia explicados em poucos minutos, do jeito que o dono de negócio precisa saber. Toda segunda tem matéria nova.</p>
+    <div class="filtros" role="group" aria-label="Filtrar por assunto">
+      <button class="filtro on" data-filtro="todas">Todas</button>
+      {% for c in categorias %}
+      <button class="filtro" data-filtro="{{ c | slugify }}">{{ c }}</button>
+      {% endfor %}
+    </div>
+  </div>
+</header>
+
+<section class="lista">
+  <div class="wrap">
+    <div class="cards">
+      {% for post in site.posts %}
+        {% if forloop.first %}
+          {% include card.html post=post destaque=true %}
+        {% else %}
+          {% include card.html post=post %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <p class="vazio">Ainda não tem matéria nesse assunto. Toda segunda chega notícia nova.</p>
+  </div>
+</section>
+
+<script>
+(function () {
+  var botoes = document.querySelectorAll('.filtro');
+  var cards = document.querySelectorAll('.lista .card');
+  var vazio = document.querySelector('.vazio');
+  function filtrar(cat) {
+    var visiveis = 0;
+    botoes.forEach(function (b) { b.classList.toggle('on', b.dataset.filtro === cat); });
+    cards.forEach(function (c) {
+      var mostra = cat === 'todas' || c.dataset.cat === cat;
+      c.style.display = mostra ? '' : 'none';
+      if (mostra) visiveis++;
+    });
+    vazio.style.display = visiveis ? 'none' : 'block';
+  }
+  botoes.forEach(function (b) {
+    b.addEventListener('click', function () {
+      filtrar(b.dataset.filtro);
+      var url = b.dataset.filtro === 'todas' ? location.pathname : location.pathname + '?cat=' + b.dataset.filtro;
+      history.replaceState(null, '', url);
+    });
+  });
+  var inicial = new URLSearchParams(location.search).get('cat');
+  if (inicial && document.querySelector('.filtro[data-filtro="' + inicial + '"]')) filtrar(inicial);
+})();
+</script>

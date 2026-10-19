@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /painelcomanda.html
+Allow: /
+
+Sitemap: https://u7midias.marketing/sitemap.xml

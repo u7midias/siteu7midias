@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% seo %}
+{% feed_meta %}
+<link rel="icon" href="{{ '/assets/img/logo-u7.jpg' | relative_url }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ '/assets/css/noticias.css' | relative_url }}">
+</head>
+<body>
+
+<nav>
+  <a href="{{ '/' | relative_url }}" class="logo"><img src="{{ '/assets/img/logo-u7.jpg' | relative_url }}" alt="U7 Mídias"></a>
+  <ul class="nav-links">
+    <li class="some-mobile"><a href="{{ '/#sistema' | relative_url }}">Sistema de pedidos</a></li>
+    <li><a href="{{ '/noticias/' | relative_url }}" class="ativo">Notícias</a></li>
+    <li class="some-mobile"><a href="https://instagram.com/u7midias" target="_blank" rel="noopener">Instagram</a></li>
+    <li><a href="{{ '/#contato' | relative_url }}" class="nav-cta">Solicitar orçamento</a></li>
+  </ul>
+</nav>
+
+{{ content }}
+
+<footer>
+  <div class="footer-inner">
+    <a href="{{ '/' | relative_url }}" class="footer-logo"><img src="{{ '/assets/img/logo-u7.jpg' | relative_url }}" alt="U7 Mídias"></a>
+    <ul class="footer-links">
+      <li><a href="{{ '/' | relative_url }}">Início</a></li>
+      <li><a href="{{ '/noticias/' | relative_url }}">Notícias</a></li>
+      <li><a href="{{ '/#contato' | relative_url }}">Contato</a></li>
+    </ul>
+    <p class="footer-copy">© {{ site.time | date: "%Y" }} U7 Mídias. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<a class="agent-btn" href="https://wa.me/{{ site.whatsapp }}?text={{ 'Oi, U7! Vim pelas notícias do site e quero saber mais sobre o sistema de pedidos.' | url_encode }}" target="_blank" rel="noopener">
+  <span class="agent-btn-dot"></span>
+  Fale com a gente
+</a>
+
+</body>
+</html>

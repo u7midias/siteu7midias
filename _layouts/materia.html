@@ -1,0 +1,58 @@
+---
+layout: base-noticias
+---
+{%- assign palavras = content | number_of_words -%}
+{%- assign minutos = palavras | divided_by: 200 | plus: 1 -%}
+<article>
+  <header class="materia-topo">
+    <div class="wrap-texto">
+      <div class="eyebrow"><a href="{{ '/noticias/' | relative_url }}?cat={{ page.categoria | slugify }}">{{ page.categoria }}</a></div>
+      <h1>{{ page.title }}</h1>
+      <p class="materia-resumo">{{ page.description }}</p>
+      <div class="materia-meta">
+        <span>{% include data-br.html data=page.date %}</span>
+        <span>·</span>
+        <span>{{ minutos }} min de leitura</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="materia-corpo">
+    <div class="wrap-texto">
+      {{ content }}
+
+      {% if page.fontes %}
+      <section class="fontes">
+        <h2>Fontes</h2>
+        <ul>
+          {% for f in page.fontes %}
+          <li><a href="{{ f.url }}" target="_blank" rel="noopener">{{ f.nome }}</a> <span>· {{ f.data }}</span></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      <aside class="cta-materia">
+        <h2>{{ page.cta_titulo | default: "Seu cliente pedindo direto com você, <strong>sem comissão</strong>." }}</h2>
+        <p>{{ page.cta_texto | default: "A gente monta o sistema de pedidos do seu negócio: o cliente escolhe no cardápio pelo celular e o pedido chega pronto pra você. Chama a gente e vê como ficaria pro seu delivery." }}</p>
+        <a class="btn-wpp" href="https://wa.me/{{ site.whatsapp }}?text={{ 'Oi, U7! Li a matéria "' | append: page.title | append: '" e quero entender como seria um sistema de pedidos pro meu negócio.' | url_encode }}" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+      </aside>
+
+      <a class="voltar" href="{{ '/noticias/' | relative_url }}">← Todas as notícias</a>
+    </div>
+  </div>
+</article>
+
+{%- assign outras = site.posts | where_exp: "p", "p.url != page.url" -%}
+{% if outras.size > 0 %}
+<section class="leia-tambem">
+  <div class="wrap">
+    <h2>Leia também</h2>
+    <div class="cards">
+      {% for p in outras limit: 3 %}
+        {% include card.html post=p %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
