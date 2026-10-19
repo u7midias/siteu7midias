@@ -14,10 +14,12 @@
 
 <nav>
   <a href="{{ '/' | relative_url }}" class="logo"><img src="{{ '/assets/img/logo-u7.jpg' | relative_url }}" alt="U7 Mídias"></a>
-  <ul class="nav-links">
-    <li class="some-mobile"><a href="{{ '/#sistema' | relative_url }}">Sistema de pedidos</a></li>
+  <button class="nav-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="menu-principal">
+    <li><a href="{{ '/#sistema' | relative_url }}">Sistema de pedidos</a></li>
+    <li><a href="{{ '/#servicos' | relative_url }}">Serviços</a></li>
     <li><a href="{{ '/noticias/' | relative_url }}" class="ativo">Notícias</a></li>
-    <li class="some-mobile"><a href="https://instagram.com/u7midias" target="_blank" rel="noopener">Instagram</a></li>
+    <li><a href="https://instagram.com/u7midias" target="_blank" rel="noopener">Instagram</a></li>
     <li><a href="{{ '/#contato' | relative_url }}" class="nav-cta">Solicitar orçamento</a></li>
   </ul>
 </nav>
@@ -29,6 +31,7 @@
     <a href="{{ '/' | relative_url }}" class="footer-logo"><img src="{{ '/assets/img/logo-u7.jpg' | relative_url }}" alt="U7 Mídias"></a>
     <ul class="footer-links">
       <li><a href="{{ '/' | relative_url }}">Início</a></li>
+      <li><a href="{{ '/#servicos' | relative_url }}">Serviços</a></li>
       <li><a href="{{ '/noticias/' | relative_url }}">Notícias</a></li>
       <li><a href="{{ '/#contato' | relative_url }}">Contato</a></li>
     </ul>
@@ -41,5 +44,18 @@
   Fale com a gente
 </a>
 
+<script>
+(function () {
+  var nav = document.querySelector('nav');
+  var botao = document.querySelector('.nav-toggle');
+  if (!nav || !botao) return;
+  botao.addEventListener('click', function () {
+    var abre = !nav.classList.contains('aberto');
+    nav.classList.toggle('aberto', abre);
+    botao.setAttribute('aria-expanded', abre ? 'true' : 'false');
+    botao.setAttribute('aria-label', abre ? 'Fechar menu' : 'Abrir menu');
+  });
+})();
+</script>
 </body>
 </html>
