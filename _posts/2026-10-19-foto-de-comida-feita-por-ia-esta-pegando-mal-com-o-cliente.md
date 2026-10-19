@@ -1,7 +1,7 @@
 ---
 title: "Foto de comida feita por IA está pegando mal com o cliente"
 description: "Uma pesquisa olhou 68 mil posts sobre inteligência artificial e compras. Quase 9 em cada 10 comentários sobre fotos e anúncios feitos com IA eram críticas, e comida foi um dos exemplos que mais apareceram."
-date: 2026-10-19 12:30:00 -0300
+date: 2026-10-19 12:00:00 -0300
 categoria: IA e tecnologia
 fontes:
   - nome: "Meio & Mensagem: Consumidor rejeita IA em moda, delivery e marketplaces"

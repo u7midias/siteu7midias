@@ -8,6 +8,9 @@ url: https://u7midias.marketing
 lang: pt_BR
 timezone: America/Sao_Paulo
 
+# Publica a matéria mesmo se o horário dela for mais tarde que o do build
+future: true
+
 # Endereço de cada matéria: u7midias.marketing/noticias/nome-da-materia/
 permalink: /noticias/:title/
 
