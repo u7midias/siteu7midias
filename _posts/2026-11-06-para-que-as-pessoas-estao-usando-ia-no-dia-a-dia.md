@@ -58,6 +58,6 @@ E um cuidado: o que a IA escreve ou cria precisa ter a sua cara. Texto com jeito
 
 ## 3 jeitos de começar esta semana
 
-1. **Peça ajuda com as contas do mês.** Cole os gastos e as vendas da semana e peça pra organizar numa tabela simples. Em poucos minutos você vê pra onde o dinheiro está indo.
+1. **Peça ajuda com as contas do mês.** Anote as vendas e os gastos na [Planilha do Autônomo](https://planilhadoautonomo.u7midias.marketing/), que a gente criou pra quem trabalha por conta própria. Depois mande a planilha pra IA e peça: "analisa minhas finanças do mês e me dá três dicas pra sobrar mais dinheiro". Em poucos minutos você vê pra onde o dinheiro está indo e o que dá pra ajustar.
 2. **Use a IA pra revisar, não pra escrever do zero.** Escreva a legenda ou a mensagem do seu jeito e peça: "deixa mais curto e com jeito de conversa". O texto continua com a sua voz.
 3. **Arrume a foto antes de postar.** Clareza, corte e fundo dá pra ajustar com IA no próprio celular. Só não troque a comida: o cliente quer ver o prato que vai chegar.
