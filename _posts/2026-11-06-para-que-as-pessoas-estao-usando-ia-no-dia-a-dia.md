@@ -36,8 +36,6 @@ Foram poucas respostas, então isso é uma conversa, não uma pesquisa com núme
 
 ## O que as pesquisas mostram
 
-Faz. E em ritmo forte.
-
 O Sebrae, junto com o Meta Instituto de Pesquisa, ouviu mais de 7 mil donos de pequenos negócios entre março e maio deste ano. **52% tinham usado IA nas duas semanas antes da entrevista.** Nos Estados Unidos, numa pesquisa parecida do governo americano, esse número foi de 21%. E 60% dos empresários brasileiros disseram que querem começar ou usar mais nos próximos seis meses.
 
 Quando a gente olha para que eles usam, aparece o mesmo retrato dos stories. Segundo outro levantamento do Sebrae, **59% dos pequenos negócios que usam IA aplicam a ferramenta na divulgação e na produção de conteúdo**: legenda, descrição de produto, ideia de post, resposta para cliente.
