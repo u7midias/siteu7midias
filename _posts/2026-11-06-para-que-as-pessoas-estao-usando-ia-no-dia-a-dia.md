@@ -3,6 +3,8 @@ title: "Para que as pessoas estão usando IA no dia a dia"
 description: "Perguntamos nos stories em que tarefas a inteligência artificial mais ajuda na rotina. Juntamos as respostas com as pesquisas mais recentes e descobrimos que o uso é bem mais pé no chão do que parece."
 date: 2026-11-06 00:00:00 -0300
 categoria: IA e tecnologia
+image: /assets/img/noticias/ia-no-dia-a-dia.jpg
+capa_alt: "Mão humana apertando a mão de um robô"
 fontes:
   - nome: "Agência Sebrae: Pequenos negócios do Brasil usam mais IA que os norte-americanos"
     data: 17/08/2026

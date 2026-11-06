@@ -105,6 +105,10 @@ nav.aberto .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-4
 .materia-corpo blockquote { border-left: 3px solid var(--accent); background: var(--bg-alt); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 0 0 1.4rem; }
 .materia-corpo blockquote p { margin: 0; color: var(--ink); font-weight: 500; }
 
+.materia-capa { margin: 0 0 2.25rem; }
+.materia-capa img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 14px; }
+.card-capa { display: block; max-width: none; width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.4rem; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 13px 13px 0 0; }
+.card.destaque .card-capa { aspect-ratio: 21 / 9; }
 .fontes { margin: 2rem 0 0; padding: 1.4rem 1.5rem; background: var(--bg-alt); border: 1px solid var(--line); border-radius: var(--radius); }
 .materia-corpo .fontes h2 { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.8rem; }
 .fontes ul { list-style: none; margin: 0; display: grid; gap: 0.5rem; }

@@ -19,6 +19,11 @@ layout: base-noticias
 
   <div class="materia-corpo">
     <div class="wrap-texto">
+      {% if page.image %}
+      <figure class="materia-capa">
+        <img src="{{ page.image | relative_url }}" alt="{{ page.capa_alt | default: page.title }}">
+      </figure>
+      {% endif %}
       {{ content }}
 
       {% if page.fontes %}

@@ -2,6 +2,8 @@
 title: "Título da matéria, curto e direto"
 description: "Uma ou duas frases contando a notícia e por que ela importa pro dono de negócio. Aparece no card da lista e no Google."
 categoria: Delivery e apps
+# Foto de capa (opcional): suba a imagem em assets/img/noticias/ e coloque o caminho aqui
+# image: /assets/img/noticias/nome-da-foto.jpg
 fontes:
   - nome: "Nome do veículo: título da matéria"
     data: 19/10/2026
