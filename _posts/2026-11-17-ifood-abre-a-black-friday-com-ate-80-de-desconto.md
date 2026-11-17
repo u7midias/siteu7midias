@@ -3,6 +3,8 @@ title: "iFood abre a Black Friday com até 80% de desconto. E o seu delivery?"
 description: "O iFood colocou a Black Friday na tela inicial do aplicativo, com cupom novo todo dia até 30 de novembro. A gente conta o que mudou e o que dá pra fazer até o dia 27 sem entrar numa guerra de desconto."
 date: 2026-11-17 00:00:00 -0300
 categoria: Delivery e apps
+image: /assets/img/noticias/black-friday.jpg
+capa_alt: "Carimbo preto com a frase Black Friday"
 fontes:
   - nome: "Central do Varejo: iFood lança página de Black Friday no app com ofertas de restaurantes a farmácias"
     data: 10/11/2026
